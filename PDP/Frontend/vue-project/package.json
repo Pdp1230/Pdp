@@ -9,6 +9,9 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit"
   },
+  "engines": {
+    "node": ">=0.7.0 <=19.6.0"
+  },
   "dependencies": {
     "vue": "^3.2.45"
   },
