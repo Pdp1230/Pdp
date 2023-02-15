@@ -1,47 +1,160 @@
-<script setup lang="ts">
+<script setup lang="ts" >
+import 'bootstrap';
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+// Récupération de tous les éléments de formulaire
+var formElements = document.querySelectorAll('input, select');
+
+// Fonction d'envoi de mail
+function sendMail() {
+  // Récupération des réponses du formulaire
+  var answers = {};
+  for (var i = 0; i < formElements.length; i++) {
+    var element = formElements[i];
+    answers[element.name] = element.value;
+  }
+  
+  // Vérification de la validité de l'adresse email
+  if (!validateEmail(answers.email)) {
+    alert('Adresse email non valide');
+    return;
+  }
+  
+  // Envoi des réponses par email (cette fonction doit être implémentée)
+  sendAnswers(answers);
+}
+
+// Validation de l'adresse email
+function validateEmail(email) {
+  // Expression régulière pour la validation de l'email
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+
+
+function exportData() {
+  // Récupération des réponses du formulaire
+  const formData = new FormData(document.getElementById("my-big-form"));
+  const data = {};
+  
+  // Boucle sur les entrées du formulaire pour les ajouter à l'objet JSON
+  for (const [key, value] of formData.entries()) {
+    data[key] = value;
+  }
+  
+  // Conversion de l'objet JSON en chaîne de caractères
+  const jsonData = JSON.stringify(data);
+  
+  // Exportation des données en format JSON
+  const a = document.createElement("a");
+  const blob = new Blob([jsonData], { type: "application/json" });
+  a.href = URL.createObjectURL(blob);
+  a.download = "form-data.json";
+  a.click();
+}
+
+async function importData() {
+  // Chargement des données depuis un fichier JSON externe
+  const response = await fetch("form-data.json");
+  const jsonData = await response.json();
+  
+  // Boucle sur les entrées du JSON pour les afficher sur la page
+  for (const [key, value] of Object.entries(jsonData)) {
+    const element = document.getElementById(key);
+    element.value = value;
+  }
+}
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+   
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="card">
+        <div class="card-header">
+          Formulaire
+        </div>
+        <div class="card-body">
+          <form id = "my-big-form">
+            <div class="form-group">
+              <label for="nom">Nom :</label>
+              <input type="text" class="form-control" id="nom" name="nom" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Adresse email :</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="question1">Animal préféré :</label>
+              <select class="form-control" id="question1" name="question1" required>
+                <option value="">Choisir...</option>
+                <option value="chien">Chien</option>
+                <option value="chat">Chat</option>
+                <option value="oiseau">Oiseau</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="question2">Couleur préférée :</label>
+              <select class="form-control" id="question2" name="question2" required>
+                <option value="">Choisir...</option>
+                <option value="rouge">Rouge</option>
+                <option value="bleu">Bleu</option>
+              </select>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Envoyer">
+          </form>
+          <button type="button" @click="exportData">Exporter les réponses</button>
+          <button type="button" @click="importData">Importer les réponses</button>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+        </div>
+      </div>
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  </body>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-}
+          body {
+        font-family: Arial, sans-serif;
+      }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+      .form-container {
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+      }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        margin-top: 6px;
+        margin-bottom: 16px;
+        resize: vertical;
+      }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+      input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+
+      .error {
+        color: #FF0000;
+      }
 </style>
