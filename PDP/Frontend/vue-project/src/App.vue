@@ -14,21 +14,8 @@ function sendMail() {
     answers[element.name] = element.value;
   }
   
-  // Vérification de la validité de l'adresse email
-  if (!validateEmail(answers.email)) {
-    alert('Adresse email non valide');
-    return;
-  }
-  
   // Envoi des réponses par email (cette fonction doit être implémentée)
   sendAnswers(answers);
-}
-
-// Validation de l'adresse email
-function validateEmail(email) {
-  // Expression régulière pour la validation de l'email
-  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
 }
 
 
@@ -87,7 +74,7 @@ async function importData() {
             </div>
             <div class="form-group">
               <label for="email">Adresse email :</label>
-              <input type="email" class="form-control" id="email" name="email" required>
+              <input type="email" class="form-control" id="email" placeholder="ismail@example.com" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Invalid email address" name="email" required>
             </div>
             <div class="form-group">
               <label for="question1">Animal préféré :</label>
@@ -106,7 +93,7 @@ async function importData() {
                 <option value="bleu">Bleu</option>
               </select>
             </div>
-            <input type="submit" class="btn btn-primary" value="Envoyer">
+            <input type="submit" class="btn btn-primary" @click="sendMail" value="Envoyer">
           </form>
           <button type="button" @click="exportData">Exporter les réponses</button>
           <button type="button" @click="importData">Importer les réponses</button>
@@ -118,43 +105,91 @@ async function importData() {
 </template>
 
 <style scoped>
-          body {
-        font-family: Arial, sans-serif;
-      }
 
-      .form-container {
-        border: 1px solid #ccc;
-        padding: 20px;
-        border-radius: 5px;
-        background-color: #fff;
-      }
 
-      input[type="text"],
-      select {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-sizing: border-box;
-        margin-top: 6px;
-        margin-bottom: 16px;
-        resize: vertical;
-      }
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
 
-      input[type="submit"] {
-        background-color: #4CAF50;
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
+.card {
+  background-color: #1c1c1c;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  transition: transform 0.2s;
+  overflow: hidden;
+}
 
-      input[type="submit"]:hover {
-        background-color: #45a049;
-      }
 
-      .error {
-        color: #FF0000;
-      }
+.card-header {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+}
+
+.form-group input[type='text'],
+.form-group input[type='email'] {
+  width: 100%;
+  padding: 10px;
+  font-size: 1.2rem;
+  border: none;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  border: none;
+  background-color: #4CAF50;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn:hover {
+  background-color: #3e8e41;
+}
+
+#file-input {
+  display: none;
+}
+
+.file-label {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  border: none;
+  background-color: #2196F3;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.file-label:hover {
+  background-color: #0c7cd5;
+}
+
 </style>
