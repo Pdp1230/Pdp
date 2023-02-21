@@ -2,6 +2,11 @@
 import 'bootstrap';
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+
+
+
+
+
 // Récupération de tous les éléments de formulaire
 var formElements = document.querySelectorAll('input, select');
 
@@ -41,17 +46,36 @@ function exportData() {
   a.click();
 }
 
-async function importData() {
-  // Chargement des données depuis un fichier JSON externe
-  const response = await fetch("form-data.json");
-  const jsonData = await response.json();
-  
-  // Boucle sur les entrées du JSON pour les afficher sur la page
-  for (const [key, value] of Object.entries(jsonData)) {
-    const element = document.getElementById(key);
-    element.value = value;
+function importQuestions() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+
+  input.onchange = () => {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.readAsText(file);
+
+    reader.onload = (e) => {
+  try {
+      const importedData = JSON.parse(e.target?.result as string);
+      const form = document.querySelector("form");
+
+      Object.keys(importedData).forEach((question) => {
+        const answer = importedData[question];
+        const input = form?.querySelector(`[name="${question}"]`) as HTMLInputElement;
+        input.value = answer;
+      });
+    } catch (error) {
+      console.error("Error parsing JSON", error);
+    }
+  };
   }
+  input.click();
 }
+
+
+
 </script>
 
 <template>
@@ -96,7 +120,7 @@ async function importData() {
             <input type="submit" class="btn btn-primary" @click="sendMail" value="Envoyer">
           </form>
           <button type="button" @click="exportData">Exporter les réponses</button>
-          <button type="button" @click="importData">Importer les réponses</button>
+          <button type="button" @click="importQuestions">Importer les réponses</button>
 
         </div>
       </div>
@@ -172,24 +196,5 @@ async function importData() {
   background-color: #3e8e41;
 }
 
-#file-input {
-  display: none;
-}
-
-.file-label {
-  display: inline-block;
-  padding: 10px 20px;
-  font-size: 1.2rem;
-  border: none;
-  background-color: #2196F3;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.file-label:hover {
-  background-color: #0c7cd5;
-}
 
 </style>
