@@ -46,7 +46,7 @@ function exportData() {
   a.click();
 }
 
-function importQuestions() {
+function importData() {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.json';
@@ -120,7 +120,7 @@ function importQuestions() {
             <input type="submit" class="btn btn-primary" @click="sendMail" value="Envoyer">
           </form>
           <button type="button" @click="exportData">Exporter les réponses</button>
-          <button type="button" @click="importQuestions">Importer les réponses</button>
+          <button type="button" @click="importData">Importer les réponses</button>
 
         </div>
       </div>
