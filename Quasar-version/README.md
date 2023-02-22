@@ -3,9 +3,9 @@
 Forms with premium features
 
 ## Install Quasar Framework
-
+```bash
 npm install -g @quasar/cli
-
+```
 ### Install the dependencies
 ```bash
 yarn
