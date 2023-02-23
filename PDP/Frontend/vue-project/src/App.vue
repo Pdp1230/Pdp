@@ -1,8 +1,7 @@
 <script setup lang="ts" >
 import 'bootstrap';
-import HelloWorld from './components/HelloWorld.vue'
+import Radiolist from './components/Radiolist.vue'
 import TheWelcome from './components/TheWelcome.vue'
-
 
 
 
@@ -101,13 +100,10 @@ function importData() {
               <input type="email" class="form-control" id="email" placeholder="ismail@example.com" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Invalid email address" name="email" required>
             </div>
             <div class="form-group">
-              <label for="question1">Animal préféré :</label>
-              <select class="form-control" id="question1" name="question1" required>
-                <option value="">Choisir...</option>
-                <option value="chien">Chien</option>
-                <option value="chat">Chat</option>
-                <option value="oiseau">Oiseau</option>
-              </select>
+              <label for="question1">Genre :</label>
+              <div class="radio-container">
+               <Radiolist :choices="['Male', 'Female']"></Radiolist>
+              </div>
             </div>
             <div class="form-group">
               <label for="question2">Couleur préférée :</label>
@@ -195,6 +191,9 @@ function importData() {
 .btn:hover {
   background-color: #3e8e41;
 }
-
+.radio-container div {
+  display: inline-block;
+  margin-right: 10px;
+}
 
 </style>
