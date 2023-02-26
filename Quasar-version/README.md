@@ -2,6 +2,20 @@
 
 Forms with premium features
 
+# Table of contents
+
+- [Forms (ubforms)](#forms-ubforms)
+  - [Pre Requirements](#pre-requirements)
+    - [First step: Install NVM(Node Version Manager)](#first-step-install-nvmnode-version-manager)
+    - [Second step: Install Node JS and NPM(Node Package Manager)](#second-step-install-node-js-and-npmnode-package-manager)
+    - [Last step: Install Quasar Framework](#last-step-install-quasar-framework)
+  - [Install the dependencies](#install-the-dependencies)
+  - [Start the app in development mode (hot-code reloading, error reporting, etc.)](#start-the-app-in-development-mode-hot-code-reloading-error-reporting-etc)
+  - [Lint the files](#lint-the-files)
+    - [Format the files](#format-the-files)
+  - [Build the app for production](#build-the-app-for-production)
+  - [Customize the configuration](#customize-the-configuration)
+
 ## Pre Requirements
 
 ### First step: Install NVM(Node Version Manager)
