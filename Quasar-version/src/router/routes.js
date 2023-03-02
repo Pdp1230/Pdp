@@ -14,6 +14,11 @@ const routes = [
         component: () => import("pages/ResetPassword.vue"),
         name: "ResetPassword",
       },
+      {
+        path: "form",
+        component: () => import("pages/Form.vue"),
+        name: "Form",
+      },
     ],
   },
 
