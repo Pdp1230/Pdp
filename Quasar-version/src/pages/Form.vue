@@ -26,7 +26,7 @@
   
 
   <script>
- import radiolist from "./RadioList.vue";
+ import radiolist from "../components/RadioList.vue";
   
   export default {
     

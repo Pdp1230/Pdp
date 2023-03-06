@@ -19,6 +19,11 @@ const routes = [
         component: () => import("pages/Form.vue"),
         name: "Form",
       },
+      {
+        path: "submit",
+        component: () => import("pages/Submit.vue"),
+        name: "Submit",
+      },
     ],
   },
 
