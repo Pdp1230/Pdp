@@ -106,6 +106,7 @@
         title: "",
         cptQuestion: 0,
         dialogForm: false,
+        formData: {}
       };
     },
     computed: {
@@ -147,16 +148,53 @@
         this.cptQuestion -= 1;
       },
       submitForm() {
-        this.forms.push({
-          title: this.title,
-          questions: [...this.questions], // "..." copie le tableau par valeurs et non pas par reference
-        });
-        this.title = "";
-        this.questions = [];
-        this.dialogForm = false;
-        this.formAdd = false;
-        this.cptQuestion = 0;
-      },
+  this.forms.push({
+    title: this.title,
+    questions: [...this.questions],
+  });
+
+  // Ajouter un type par défaut "radio" pour chaque question qui n'a pas de type défini
+  this.questions.forEach(question => {
+    if (!question.type) {
+      question.type = "radio";
+    }
+  });
+
+  this.formData = {
+    forms: this.forms
+  };
+
+  const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
+  const fileContent = JSON.stringify(this.formData, null, 2);
+  const fileBlob = new Blob([fileContent], { type: "application/json" });
+
+  const fileLink = document.createElement("a");
+  fileLink.href = URL.createObjectURL(fileBlob);
+  fileLink.download = fileName;
+  fileLink.click();
+
+  this.title = "";
+  this.questions = [];
+  this.dialogForm = false;
+  this.formAdd = false;
+  this.cptQuestion = 0;
+
+  const formDataUrl = URL.createObjectURL(fileBlob);
+  fetch(formDataUrl)
+    .then(response => response.json())
+    .then(data => {
+      this.formData = data.forms[0]; // Récupérer le premier formulaire dans le tableau de formulaires
+      this.questions = this.formData.questions;
+      this.questions.forEach(question => {
+        if (!question.type) {
+          question.type = "radio";
+        }
+      });
+    });
+},
+
+
+
     },
   };
   </script>
