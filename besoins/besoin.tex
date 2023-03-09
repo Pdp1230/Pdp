@@ -1,0 +1,83 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{cahier de besoin pdp}
+
+\date{2023}
+
+\begin{document}
+\maketitle
+\newpage
+
+\section{Généralité sur les besoins}
+
+\subsection{Besoins fonctionnels:}
+\begin{enumerate}
+
+\item Le formulaire doit permettre de créer des questions de différents types : choix multiple, choix unique, case à cocher, zone de texte, etc.
+
+\item Gestion des questions: le système doit permettre la création, la modification et la suppression de questions dans le formulaire.
+\item Gestion des réponses: le système doit enregistrer les réponses des utilisateurs de manière efficace et sécurisée.
+\item Présentation des questions: le système doit permettre la personnalisation de l'apparence du formulaire, incluant la mise en forme des questions et des choix de réponse.
+\item Ordre de préférence: le système doit permettre aux utilisateurs de définir un ordre de préférence entre différentes options.
+\item Envoi automatique d'email: le système doit envoyer un email personnalisé à chaque personne qui remplit le formulaire.
+\item Import/Export des données: le système doit permettre l'import et l'export des données de formulaire dans un format texte ou JSON.
+\end{enumerate}
+
+\subsection{Besoins non fonctionnels:}
+
+\begin{enumerate}
+\item Le formulaire doit avoir une interface utilisateur conviviale et facile à utiliser pour les répondants.
+
+\item Performance: le système doit être rapide et fonctionner de manière fluide, même en cas de grand nombre de réponses au formulaire.
+\item Sécurité: le système doit garantir la confidentialité des données des utilisateurs et n'être accessible qu'à l'administrateur du formulaire.
+\item Fiabilité: Le formulaire doit être rapide et efficace pour améliorer l'expérience utilisateur et éviter les temps d'attente inutiles.
+
+\item Accessibilité: le système doit être facile à utiliser et accessible à un large public.
+Le formulaire doit être conforme aux normes d'accessibilité pour permettre aux personnes atteintes de handicaps par exemple de remplir le formulaire.
+
+\item Conformité aux normes: le système doit respecter les normes en vigueur en matière de sécurité et de protection des données.
+\end{enumerate}
+\newpage
+\section{Besoins fonctionnelle et éxigence technique Backend}
+
+\subsection {Exigences fonctionnelles pour le backend :}
+\begin{enumerate}
+\item Créer un modèle de données pour stocker les informations de formulaire et les réponses de formulaire.
+\item Définir les API REST pour les opérations CRUD sur les formulaires et les réponses.
+\item Implémenter un mécanisme d'authentification pour protéger les données de formulaire.
+\item Mettre en place un mécanisme d'envoi de courrier électronique personnalisé pour les réponses de formulaire.
+\item Créer un outil d'exportation pour permettre l'exportation des formulaires et des réponses au format texte ou JSON.
+\end{enumerate}
+
+\subsection{Exigences techniques pour le backend :}
+\begin{enumerate}
+\item Utiliser le framework .... pour le développement du backend.
+\item Utiliser une base de données relationnelle comme MySQL ou PostgreSQL pour stocker les données du formulaire.
+\item Implémenter des tests unitaires pour chaque API REST.
+\item Mettre en place des journaux pour faciliter le débogage.
+\item Utiliser un système de gestion de version comme Git pour le contrôle de version.
+\end{enumerate}
+\newpage
+
+
+\section{Besoins fonctionnelle et éxigence technique frontend}
+\subsection{Exigences fonctionnelles pour le frontend :}
+\begin{enumerate}
+\item Créer une interface utilisateur pour la création, la visualisation et la modification de formulaires.
+\item Permettre la personnalisation de l'apparence du formulaire par des développeurs front-end.
+\item Afficher les réponses de formulaire sous forme de graphiques ou de tableaux.
+\item Permettre aux utilisateurs de classer les choix par ordre de préférence.
+
+\end{enumerate}
+\subsection{Exigences techniques pour le frontend :}
+\begin{enumerate}
+\item Utiliser le framework Quasar pour le développement du frontend.
+\item Utiliser HTML, CSS et JavaScript pour la création de l'interface utilisateur.
+\item Utiliser des bibliothèques graphiques comme Chart.js pour l'affichage des données de formulaire sous forme de graphiques.
+\item Utiliser un système de gestion de version comme Git pour le contrôle de version.
+
+\end{enumerate}
+
+\end{document}
+
