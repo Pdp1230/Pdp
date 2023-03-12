@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="formData" class="q-pa-md">
+    <div v-if="formData" class="q-pa-md" :style="formStyle">
       <h1 class="q-mb-md">{{ formData.forms[0].title }}</h1>
       <form class="q-form">
         <div v-for="(question, index) in formData.forms[0].questions" :key="index" class="q-mb-md">
@@ -8,17 +8,10 @@
           <br>
           <component :is="question.component" v-model="question.response.value" :options="question.options" class="q-input" />
         </div>
-        <q-btn label="Submit" class="q-mt-lg" @click.prevent="applyStyle()" />
+        <q-btn label="Submit" class="q-mt-lg" />
       </form>
     </div>
-    <div v-if="formData">
-  <div class="q-mb-lg">
-    <label class="q-mb-sm">Custom CSS</label>
-    <br>
-    <textarea v-model="style" class="q-input"></textarea>
-  </div>
-  <q-btn label="Submit" class="q-mt-lg" @click.prevent="applyStyle()" />
-</div>
+    <div v-if="formData"></div>
     <input type="file" accept=".json" id="json-input">
   </div>
 </template>
@@ -36,21 +29,23 @@ export default {
     return {
       questionOptions: [1, 2, 3, 4, 5],
       formData: null,
-      style: ""
+      formStyle: "",
     };
   },
   mounted() {
-    document.getElementById('json-input').addEventListener('change', (event) => {
+    document.getElementById("json-input").addEventListener("change", (event) => {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.readAsText(file);
-
       reader.onload = () => {
         const json = reader.result;
         this.formData = JSON.parse(json);
         this.formData.forms.forEach((form) => {
+          const styleElem = document.createElement("style");
+          styleElem.innerHTML = form.style.replace(/\n/g, "");
+          document.head.appendChild(styleElem);
           form.questions.forEach((question) => {
-            switch(question.type) {
+            switch (question.type) {
               case "text":
               case "textarea":
               case "checkbox":
@@ -63,20 +58,15 @@ export default {
             }
             if (!question.response) {
               question.response = {
-                value: null
+                value: null,
               };
             }
           });
         });
+        this.formStyle = "";
       };
     });
   },
-  methods: {
-  applyStyle() {
-    const styleTag = document.createElement("style");
-    styleTag.innerHTML = this.style;
-    document.head.appendChild(styleTag);
-  }
-}
+  methods: {},
 };
 </script>
