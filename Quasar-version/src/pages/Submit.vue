@@ -15,7 +15,6 @@
     <input type="file" accept=".json" id="json-input">
   </div>
 </template>
-
 <script>
 import RadioList from "../components/RadioList.vue";
 import { ref } from 'vue';
@@ -41,7 +40,13 @@ export default {
         const json = reader.result;
         this.formData = JSON.parse(json);
         this.formData.forms.forEach((form) => {
+          // Supprimer l'élément de style précédent avant d'en ajouter un nouveau
+          const prevStyleElem = document.querySelector("#form-style");
+          if (prevStyleElem) {
+            document.head.removeChild(prevStyleElem);
+          }
           const styleElem = document.createElement("style");
+          styleElem.id = "form-style";
           styleElem.innerHTML = form.style.replace(/\n/g, "");
           document.head.appendChild(styleElem);
           form.questions.forEach((question) => {
