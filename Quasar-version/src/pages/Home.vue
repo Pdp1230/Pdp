@@ -91,6 +91,12 @@
                 :placeholder="'question number ' + question.index"
                 class="col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
               />
+              <q-select
+                v-model="question.type"
+                hint="Select the question type"
+                :options="['radio', 'text', 'checkbox', 'textarea']"
+                class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
+              />
               <q-btn
                 v-if="question.index === questions[questions.length - 1].index"
                 flat
@@ -149,6 +155,7 @@ export default {
       title: "",
       email:"",
       style:"",
+      type:"",
       cptQuestion: 0,
       dialogForm: false,
       formData: {}
@@ -185,6 +192,7 @@ export default {
       this.questions.push({
         index: this.cptQuestion,
         modelQ: "",
+        type:"",
       });
     },
     addCssTemplate() {
@@ -257,7 +265,7 @@ export default {
           // Ajouter un type par défaut "radio" pour chaque question qui n'a pas de type défini
           this.questions.forEach(question => {
             if (!question.type) {
-              question.type = "radio";
+              question.type = this.type;
             }
           });
 
@@ -300,10 +308,54 @@ export default {
   };
   </script>
 
-  <style>
+  <style scoped>
 
   #textbuttons{
     width: 350px;
 
   }
+  textarea {
+  margin-top: 10px;
+  margin-left: 50px;
+  width: 500px;
+  height: 100px;
+
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.07);
+  border-color: -moz-use-text-color #FFFFFF #FFFFFF -moz-use-text-color;
+  border-image: none;
+  border-radius: 6px 6px 6px 6px;
+  border-style: none solid solid none;
+  border-width: medium 1px 1px medium;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12) inset;
+  color: #555555;
+  font-family: Helveticaf;
+  font-size: 1em;
+  line-height: 1.4em;
+  padding: 5px 8px;
+  transition: background-color 0.2s ease 0s;
+  scrollbar-color: #ccc #f5f5f5;
+  scrollbar-width: thin;
+}
+
+
+#textcss::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#textcss::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+#textcss::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+}
+
+textarea:focus {
+    background: none repeat scroll 0 0 #FFFFFF;
+    outline-width: 0;
+}
+
+
   </style>

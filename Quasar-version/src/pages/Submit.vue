@@ -53,15 +53,24 @@ export default {
           document.head.appendChild(styleElem);
           form.questions.forEach((question) => {
             switch (question.type) {
-              case "text":
+              case "select":
+                question.component = "select";
+                question.options = this.questionOptions;
+                break;
               case "textarea":
+                question.component = "textarea";
+                question.options = this.questionOptions;
+                break;
               case "checkbox":
                 question.component = "input";
+                question.options = this.questionOptions;
                 break;
               case "radio":
                 question.component = "RadioList";
                 question.options = this.questionOptions;
                 break;
+              default:
+                throw new Error(`Unknown question type: ${question.type}`);
             }
             if (!question.response) {
               question.response = {
