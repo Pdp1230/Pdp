@@ -9,6 +9,18 @@
         Click on this button in order to add a form
       </p>
     </div>
+    <q-list dense>
+  <q-item v-for="form in forms" :key="form.id">
+    <q-item-section>
+      <q-item-label>{{ form.title }}</q-item-label>
+      <q-item-label caption>{{ form.email }}</q-item-label>
+    </q-item-section>
+    <q-item-section side>
+      <q-btn icon="edit" @click="editForm(form)" />
+      <q-btn icon="delete" @click="deleteForm(form.id)" />
+    </q-item-section>
+  </q-item>
+</q-list>
 
     <q-dialog
       v-model="dialogForm"
@@ -145,6 +157,7 @@
 </template>
 
 <script>
+import { v4 as uuidv4 } from "uuid";
 export default {
   name: "formCreator",
   data() {
@@ -180,6 +193,10 @@ export default {
     
     addForm() {
       this.dialogForm = true;
+      this.title = "";
+      this.email = "";
+      this.questions = [{ index: 1, modelQ: "", type: "radio" }];
+      this.formId = uuidv4();
     },
     closeDialog() {
       this.dialogForm = false;
@@ -257,8 +274,10 @@ export default {
         
           this.forms.push({
             title: this.title,
+            id: this.formId,
             style: this.style,
-            ownersemail: this.email,
+            ownersemail: this.ownersemail,
+            email: this.email,
             questions: [...this.questions],
           });
 
@@ -301,7 +320,18 @@ export default {
               });
             });
         },
-
+        editForm(form) {
+  this.dialogForm = true;
+  this.formId = form.id;
+  this.title = form.title;
+  this.email = form.email;
+  this.style = form.style;
+  this.questions = form.questions;
+}
+,
+deleteForm(formId) {
+  this.forms = this.forms.filter((form) => form.id !== formId);
+},
 
 
     },
