@@ -60,6 +60,8 @@
             flat
             class="q-ml-md"
             no-caps/>
+        </div>
+        <div class="row" >
           <q-btn
             v-if="questions.length === 0"
             dense
@@ -72,19 +74,19 @@
           />
         </div>
         <div v-if="changeFormStyle" class="row justify-bottom q-mt-lg q-mb-md">
-            <textarea 
-            id="textcss"
-            v-model="style" 
-            class="q-input col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"  
-            placeholder="      /* Customize your form here */
-                                  .q-input {
-                                    /* Add custom styles */
-                                  }
-                                  .q-card {
-                                    /* Add custom styles */
-                                  }
-                                  /* Add more custom styles as needed */"
-            ></textarea>
+          <textarea 
+          id="textcss"
+          v-model="style" 
+          class="q-input col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"  
+          placeholder="      /* Customize your form here */
+                                .q-input {
+                                  /* Add custom styles */
+                                }
+                                .q-card {
+                                  /* Add custom styles */
+                                }
+                                /* Add more custom styles as needed */"
+          ></textarea>
           <div id="textbuttons">
             <q-btn 
             dense icon="style" 
@@ -100,6 +102,7 @@
             />
           </div>
         </div>
+
         <div class="q-ml-md">
           <div v-for="question in questions" :key="question.index">
             <div class="flex row">
@@ -115,6 +118,8 @@
                 :options="['radio', 'text', 'checkbox', 'textarea']"
                 class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
               />
+            </div>
+            <div class="row">
               <q-btn
                 v-if="question.index === questions[questions.length - 1].index"
                 flat
@@ -202,7 +207,7 @@ export default {
       this.dialogForm = true;
       this.title = "";
       this.email = "";
-      this.questions = [{ index: 1, modelQ: "", type: "radio" }];
+      this.questions = [];
       this.formId = uuidv4();
     },
     closeDialog() {
@@ -216,7 +221,7 @@ export default {
       this.questions.push({
         index: this.cptQuestion,
         modelQ: "",
-        type:"",
+        type:"text",
       });
     },
     addCssTemplate() {
