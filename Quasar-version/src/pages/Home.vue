@@ -53,6 +53,14 @@
             hint="obligatory"
             class="q-ml-md" />
           <q-btn
+            dense
+            icon="style"
+            label="Change Style"
+            @click="changeFormStyle = !changeFormStyle"
+            flat
+            class="q-ml-md"
+            no-caps/>
+          <q-btn
             v-if="questions.length === 0"
             dense
             icon="add"
@@ -62,10 +70,8 @@
             class="q-ml-md"
             no-caps
           />
-
         </div>
-        <div class="row justify-bottom q-mt-lg q-mb-md">
-        
+        <div v-if="changeFormStyle" class="row justify-bottom q-mt-lg q-mb-md">
             <textarea 
             id="textcss"
             v-model="style" 
@@ -79,7 +85,7 @@
                                   }
                                   /* Add more custom styles as needed */"
             ></textarea>
-        <div id="textbuttons">
+          <div id="textbuttons">
             <q-btn 
             dense icon="style" 
             label="Add CSS template" 
@@ -92,8 +98,8 @@
             class="q-ml-md"
             @click="clearStyle"
             />
-            </div>
           </div>
+        </div>
         <div class="q-ml-md">
           <div v-for="question in questions" :key="question.index">
             <div class="flex row">
@@ -171,7 +177,8 @@ export default {
       type:"",
       cptQuestion: 0,
       dialogForm: false,
-      formData: {}
+      formData: {},
+      changeFormStyle: false
     };
   },
   computed: {
