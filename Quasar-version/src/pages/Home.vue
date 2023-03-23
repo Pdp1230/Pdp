@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-use-computed-property-like-method -->
 <template>
   <div>
     <div class="row justify-center q-mt-lg">
@@ -105,7 +106,7 @@
 
         <div class="q-ml-md">
           <div v-for="question in questions" :key="question.index">
-            <div class="flex row">
+            <div class="flex row q-mt-lg">
               <q-input
                 v-model="question.modelQ"
                 hint="you need to fill in the question"
@@ -117,7 +118,45 @@
                 hint="Select the question type"
                 :options="['radio', 'text', 'checkbox', 'textarea']"
                 class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
+                @update:model-value="updateOptionsArray(question.index,question.type)"
               />
+              {{ question }}
+              <q-btn
+                v-if="question.cptOptions === 0 && (question.type==='radio' || question.type==='checkbox')"
+                dense
+                icon="add"
+                label="addOption"
+                @click="addOption(question.index)"
+                flat
+                no-caps
+              />
+            </div>
+            <div v-if="question.type==='radio' || question.type==='checkbox'">
+              <div class="row q-my-md" v-for="option in question.options" :key="option.index">
+                <q-input
+                  v-model="option.modelQ"
+                  hint="you need to fill in the option"
+                  :placeholder="'option number ' + option.index"
+                  class="col-md-4 col-sm-8 col-xs-10 col-lg-3 col-xl-3 bg-grey-1 rounded-borders"
+                />
+                <q-btn
+                  v-if="option.index === question.cptOptions && (question.type==='radio' || question.type==='checkbox')"
+                  flat
+                  dense
+                  icon="add"
+                  label="addOption"
+                  @click="addOption(question.index)"
+                  no-caps
+                />
+                <q-btn
+                  flat
+                  dense
+                  icon="delete"
+                  label="deleteOption"
+                  @click="deleteOption(question.index,option.index)"
+                  no-caps
+                />
+              </div>
             </div>
             <div class="row">
               <q-btn
@@ -221,8 +260,43 @@ export default {
       this.questions.push({
         index: this.cptQuestion,
         modelQ: "",
-        type:"text",
+        type:'radio',
+        options: [],
+        cptOptions: 0,
       });
+    },
+    deleteQuestion(index) {
+      let cpt = 1;
+      this.questions = this.questions
+        .filter((question) => question.index !== index)
+        .map((question) => ({
+          ...question,
+          index: cpt++,
+        }));
+      this.cptQuestion -= 1;
+    },
+    updateOptionsArray(questionIndex,questionType){
+      if(questionType !== 'radio' && questionType !== 'checkbox'){
+        this.questions[questionIndex-1].options = [];
+        this.questions[questionIndex-1].cptOptions = 0;
+      }
+    },
+    addOption(index){
+      this.questions[index-1].cptOptions += 1;
+      this.questions[index-1].options.push({
+        index: this.questions[index-1].cptOptions,
+        modelQ: "",
+      });
+    },
+    deleteOption(indexQuestion, indexOption) {
+      let cpt = 1;
+      this.questions[indexQuestion-1].options = this.questions[indexQuestion-1].options
+        .filter((option) => option.index !== indexOption)
+        .map((option) => ({
+          ...option,
+          index: cpt++,
+        }));
+      this.questions[indexQuestion-1].cptOptions -= 1;
     },
     addCssTemplate() {
   const cssTemplate = `
@@ -272,16 +346,6 @@ export default {
   clearStyle() {
     this.style = "";
   },
-    deleteQuestion(index) {
-      let cpt = 1;
-      this.questions = this.questions
-        .filter((question) => question.index !== index)
-        .map((question) => ({
-          ...question,
-          index: cpt++,
-        }));
-      this.cptQuestion -= 1;
-    },
       submitForm() {
         
           this.forms.push({
