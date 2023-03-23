@@ -1,18 +1,22 @@
 <template>
   <div>
-    <div v-if="formData" class="q-pa-md" :style="formStyle">
-      <h1 class="q-mb-md">{{ formData.forms[0].title }}</h1>
-      <form class="q-form" @submit.prevent="submitForm">
-        <div v-for="(question, index) in formData.forms[0].questions" :key="index" class="q-mb-md">
-          <label class="q-mb-sm">{{ question.modelQ }}</label>
+    <div v-if="formData" class="form-wrapper" :style="formStyle">
+      <h1 class="form-title">{{ formData.forms[0].title }}</h1>
+      <form class="form" @submit.prevent="submitForm">
+        <div v-for="(question, index) in formData.forms[0].questions" :key="index" class="form-question">
+          <label class="form-label">{{ question.modelQ }}</label>
           <br>
-          <component :is="question.component" v-model="question.response.value" :options="question.options" class="q-input" />
+          <component :is="question.component" v-model="question.response.value" :options="question.options" class="form-input">
+            <template #option="{ option }">
+              {{ option.modelQ }}
+            </template>
+          </component>
         </div>
-        <div class="q-mb-md">
-          <label class="q-mb-sm">Email Address</label>
-          <input type="email" v-model="userEmail" class="q-input" required />
+        <div class="form-email">
+          <label class="form-label">Email Address</label>
+          <input type="email" v-model="userEmail" class="form-input" required />
         </div>
-        <q-btn label="Submit" type="submit" class="q-mt-lg" />
+        <q-btn label="Submit" type="submit" class="form-submit" />
       </form>
     </div>
     <div v-else>
@@ -20,6 +24,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import RadioList from "../components/RadioList.vue";
 import { ref } from 'vue';
@@ -31,60 +36,96 @@ export default {
   },
   data() {
     return {
-      questionOptions: [1, 2, 3, 4, 5],
+      questionOptions: [],
       formData: null,
       formStyle: "",
       userEmail: "",
+      group: [],
     };
   },
   methods: {
     loadFormData(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.readAsText(file);
-      reader.onload = () => {
-        const json = reader.result;
-        this.formData = JSON.parse(json);
-        this.formData.forms.forEach((form) => {
-          const styleElem = document.createElement("style");
-          styleElem.id = "form-style";
-          styleElem.innerHTML = form.style.replace(/\n/g, "");
-          document.head.appendChild(styleElem);
-          form.questions.forEach((question) => {
-            switch (question.type) {
-              case "select":
-                question.component = "select";
-                question.options = this.questionOptions;
-                break;
-              case "textarea":
-                question.component = "textarea";
-                question.options = this.questionOptions;
-                break;
-              case "checkbox":
-                question.component = "input";
-                question.options = this.questionOptions;
-                break;
-              case "radio":
-                question.component = "RadioList";
-                question.options = this.questionOptions;
-                break;
-              case "rating":
-                question.component = "q-rating";
-                question.options = this.questionOptions;
-                break;
-              default:
-                throw new Error(`Unknown question type: ${question.type}`);
-            }
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.readAsText(file);
+  reader.onload = () => {
+    const json = reader.result;
+    this.formData = JSON.parse(json);
+    const optionsMap = new Map();
+    this.formData.forms.forEach((form) => {
+      const styleElem = document.createElement("style");
+      styleElem.id = "form-style";
+      styleElem.innerHTML = form.style.replace(/\n/g, "");
+      document.head.appendChild(styleElem);
+      form.questions.forEach((question) => {
+        switch (question.type) {
+          case "select":
+            question.component = "select";
+            question.options = this.questionOptions;
+            break;
+          case "textarea":
+            question.component = "q-textarea";
+            question.options = this.questionOptions;
+            break;
+          case "checkbox":
+          question.component = "q-checkbox";
             if (!question.response) {
               question.response = {
                 value: null,
               };
             }
-          });
-        });
-        this.formStyle = "";
+            if (question.options && question.options.length > 0) {
+              question.options = question.options.map((option) => option.modelQ);
+            }
+          break;
+          case "radio":
+          question.component = "RadioList";
+              if (!question.response) {
+                question.response = {
+                  value: null,
+                };
+              }
+              if (question.options && question.options.length > 0) {
+                question.options = question.options.map((option) => option.modelQ);
+              }
+          break;
+          case "rating":
+            question.component = "q-rating";
+            question.options = this.questionOptions;
+            break;
+          default:
+            throw new Error(`Unknown question type: ${question.type}`);
+        }
+        if (!question.response) {
+          question.response = {
+            value: null,
+          };
+        }
+      });
+    });
+    // create the questionOptions array
+    // create the questionOptions array
+    this.questionOptions = Array.from(optionsMap).map(([modelQ, options]) => {
+      return {
+        modelQ,
+        options,
       };
-    },
+    }).map(option => option.modelQ); 
+    // set the options property for each question object
+    this.formData.forms.forEach((form) => {
+      form.questions.forEach((question) => {
+        if (question.options && question.options.length > 0) {
+          const options = this.questionOptions.find((qo) => qo.modelQ === question.modelQ);
+          if (options) {
+            question.options = options.options;
+          }
+        }
+      });
+    });
+    this.formStyle = "";
+  };
+},
+
     async submitForm() {
       const formData = this.formData.forms[0];
       const data = formData.questions.reduce((acc, question) => {
