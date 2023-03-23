@@ -121,6 +121,7 @@
                 :options="['radio', 'text', 'checkbox', 'textarea','rating']"
                 class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
                 @update:model-value="updateOptionsArray(question.index,question.type)"
+                
               />
               {{ question }}
               <q-btn
@@ -268,7 +269,6 @@ export default {
         cptOptions: 0,
       });
     },
-<<<<<<< HEAD
     deleteQuestion(index) {
       let cpt = 1;
       this.questions = this.questions
@@ -302,17 +302,6 @@ export default {
         }));
       this.questions[indexQuestion-1].cptOptions -= 1;
     },
-=======
-    shareForm(url) {
-  if (navigator.share) {
-    navigator.share({
-      url: url
-    });
-  } else {
-    window.prompt("Copy the URL below to share the form:", url);
-  }
-},
->>>>>>> 6e52fd6139fac3e029d494fc3f9ccd8a67c89fb6
     addCssTemplate() {
   const cssTemplate = `
 
@@ -361,61 +350,57 @@ export default {
   clearStyle() {
     this.style = "";
   },
-      submitForm() {
-           const uuid = require("uuid");
-          const formId = uuid.v4();
-          const url = window.location.origin + '/form/' + formId;
-          
+  submitForm() {
+  const uuid = require("uuid");
+  const formId = uuid.v4();
+  const url = window.location.origin + "/form/" + formId;
 
-          this.formUrl = url;
-          this.forms.push({
-            title: this.title,
-            id: this.formId,
-            style: this.style,
-            ownersemail: this.ownersemail,
-            email: this.email,
-            url: url,
-            questions: [...this.questions],
-          });
-          // Ajouter un type par défaut "radio" pour chaque question qui n'a pas de type défini
-          this.questions.forEach(question => {
-            if (!question.type) {
-              question.type = this.type;
-            }
-          });
+  this.formUrl = url;
 
-          this.formData = {
-            forms: this.forms
-          };
+  const formData = {
+    title: this.title,
+    id: formId,
+    style: this.style,
+    ownersemail: this.ownersemail,
+    email: this.email,
+    url: url,
+    questions: this.questions.map((question) => ({
+      modelQ: question.modelQ,
+      type: question.type,
+      options: question.options.map((option) => ({
+        modelQ: option.modelQ,
+      })),
+    })),
+  };
 
-          const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
-          const fileContent = JSON.stringify(this.formData, null, 2);
-          const fileBlob = new Blob([fileContent], { type: "application/json" });
 
-          const fileLink = document.createElement("a");
-          fileLink.href = URL.createObjectURL(fileBlob);
-          fileLink.download = fileName;
-          fileLink.click();
 
-          this.title = "";
-          this.questions = [];
-          this.dialogForm = false;
-          this.formAdd = false;
-          this.cptQuestion = 0;
+  this.formData = {
+    forms: [formData],
+  };
 
-          const formDataUrl = URL.createObjectURL(fileBlob);
-          fetch(formDataUrl)
-            .then(response => response.json())
-            .then(data => {
-              this.formData = data.forms[0]; // Récupérer le premier formulaire dans le tableau de formulaires
-              this.questions = this.formData.questions;
-              this.questions.forEach(question => {
-                if (!question.type) {
-                  question.type = "radio";
-                }
-              });
-            });
-        },
+  const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
+  const fileContent = JSON.stringify(this.formData, null, 2);
+  const fileBlob = new Blob([fileContent], { type: "application/json" });
+
+  const fileLink = document.createElement("a");
+  fileLink.href = URL.createObjectURL(fileBlob);
+  fileLink.download = fileName;
+  fileLink.click();
+
+  this.title = "";
+  this.questions = [];
+  this.dialogForm = false;
+  this.formAdd = false;
+  this.cptQuestion = 0;
+
+  const formDataUrl = URL.createObjectURL(fileBlob);
+  fetch(formDataUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      this.formData = data.forms[0]; // Récupérer le premier formulaire dans le tableau de formulaires
+    });
+},
         editForm(form) {
   this.dialogForm = true;
   this.formId = form.id;
@@ -423,6 +408,7 @@ export default {
   this.email = form.email;
   this.style = form.style;
   this.questions = form.questions;
+  this.options = form.options;
 }
 ,
 deleteForm(formId) {
