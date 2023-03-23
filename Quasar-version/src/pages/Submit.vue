@@ -24,7 +24,6 @@
 import RadioList from "../components/RadioList.vue";
 import { ref } from 'vue';
 import axios from 'axios';
-
 export default {
   name: "formResponse",
   components: {
@@ -69,6 +68,10 @@ export default {
                 question.component = "RadioList";
                 question.options = this.questionOptions;
                 break;
+              case "rating":
+                question.component = "q-rating";
+                question.options = this.questionOptions;
+                break;
               default:
                 throw new Error(`Unknown question type: ${question.type}`);
             }
@@ -88,7 +91,6 @@ export default {
         acc[question.modelQ] = question.response ? question.response.value : null;
         return acc;
       }, {});
-
       try {
         //Il faut implémenté coté backend l'envoye de mail et la gestion serveur ou bien utiliser un API d'envoye de mail
         const response = await axios.post('/api/sendmail', {
