@@ -301,7 +301,6 @@ export default {
         }));
       this.questions[indexQuestion-1].cptOptions -= 1;
     },
-<<<<<<< HEAD
     shareForm(url) {
       if (navigator.share) {
         navigator.share({
@@ -311,8 +310,6 @@ export default {
         window.prompt("Copy the URL below to share the form:", url);
       } 
     },
-=======
->>>>>>> refs/remotes/origin/main
     addCssTemplate() {
   const cssTemplate = `
 
