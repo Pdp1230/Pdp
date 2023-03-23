@@ -16,8 +16,10 @@
       <q-item-label caption>{{ form.email }}</q-item-label>
     </q-item-section>
     <q-item-section side>
-      <q-btn icon="edit" @click="editForm(form)" />
+      <q-btn icon="edit"   @click="editForm(form)" />
       <q-btn icon="delete" @click="deleteForm(form.id)" />
+      <q-btn icon="share"  @click="shareForm(form.url)"/>
+
     </q-item-section>
   </q-item>
 </q-list>
@@ -115,7 +117,7 @@
               <q-select
                 v-model="question.type"
                 hint="Select the question type"
-                :options="['radio', 'text', 'checkbox', 'textarea']"
+                :options="['radio', 'text', 'checkbox', 'textarea','rating']"
                 class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
               />
             </div>
@@ -183,7 +185,8 @@ export default {
       cptQuestion: 0,
       dialogForm: false,
       formData: {},
-      changeFormStyle: false
+      changeFormStyle: false,
+      formUrl: "",
     };
   },
   computed: {
@@ -224,6 +227,15 @@ export default {
         type:"text",
       });
     },
+    shareForm(url) {
+  if (navigator.share) {
+    navigator.share({
+      url: url
+    });
+  } else {
+    window.prompt("Copy the URL below to share the form:", url);
+  }
+},
     addCssTemplate() {
   const cssTemplate = `
 
@@ -283,16 +295,21 @@ export default {
       this.cptQuestion -= 1;
     },
       submitForm() {
-        
+           const uuid = require("uuid");
+          const formId = uuid.v4();
+          const url = window.location.origin + '/form/' + formId;
+          
+
+          this.formUrl = url;
           this.forms.push({
             title: this.title,
             id: this.formId,
             style: this.style,
             ownersemail: this.ownersemail,
             email: this.email,
+            url: url,
             questions: [...this.questions],
           });
-
           // Ajouter un type par défaut "radio" pour chaque question qui n'a pas de type défini
           this.questions.forEach(question => {
             if (!question.type) {
