@@ -122,7 +122,6 @@
                 class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
                 @update:model-value="updateOptionsArray(question.index,question.type)"
               />
-              {{ question }}
               <q-btn
                 v-if="question.cptOptions === 0 && (question.type==='radio' || question.type==='checkbox')"
                 dense
@@ -268,7 +267,6 @@ export default {
         cptOptions: 0,
       });
     },
-<<<<<<< HEAD
     deleteQuestion(index) {
       let cpt = 1;
       this.questions = this.questions
@@ -302,17 +300,15 @@ export default {
         }));
       this.questions[indexQuestion-1].cptOptions -= 1;
     },
-=======
     shareForm(url) {
-  if (navigator.share) {
-    navigator.share({
-      url: url
-    });
-  } else {
-    window.prompt("Copy the URL below to share the form:", url);
-  }
-},
->>>>>>> 6e52fd6139fac3e029d494fc3f9ccd8a67c89fb6
+      if (navigator.share) {
+        navigator.share({
+          url: url
+        });
+      } else {
+        window.prompt("Copy the URL below to share the form:", url);
+      } 
+    },
     addCssTemplate() {
   const cssTemplate = `
 
