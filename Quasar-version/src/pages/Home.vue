@@ -64,18 +64,6 @@
             class="q-ml-md"
             no-caps/>
         </div>
-        <div class="row" >
-          <q-btn
-            v-if="questions.length === 0"
-            dense
-            icon="add"
-            label="addQuestion"
-            @click="addQuestion"
-            flat
-            class="q-ml-md"
-            no-caps
-          />
-        </div>
         <div v-if="changeFormStyle" class="row justify-bottom q-mt-lg q-mb-md">
           <textarea 
           id="textcss"
@@ -106,78 +94,72 @@
           </div>
         </div>
 
-        <div class="q-ml-md">
           <div v-for="question in questions" :key="question.index">
-            <div class="flex row q-mt-lg">
-              <q-input
-                v-model="question.modelQ"
-                hint="you need to fill in the question"
-                :placeholder="'question number ' + question.index"
-                class="col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
-              />
-              <q-select
-                v-model="question.type"
-                hint="Select the question type"
-                :options="['radio', 'text', 'checkbox', 'textarea','rating']"
-                class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
-                @update:model-value="updateOptionsArray(question.index,question.type)"
-                
-              />
-              <q-btn
-                v-if="question.cptOptions === 0 && (question.type==='radio' || question.type==='checkbox')"
-                dense
-                icon="add"
-                label="addOption"
-                @click="addOption(question.index)"
-                flat
-                no-caps
-              />
-            </div>
-            <div v-if="question.type==='radio' || question.type==='checkbox'">
-              <div class="row q-my-md" v-for="option in question.options" :key="option.index">
+            <div class=" q-mt-xl q-ml-md bg-white">
+              <div class="flex row q-mt-xl">
                 <q-input
-                  v-model="option.modelQ"
-                  hint="you need to fill in the option"
-                  :placeholder="'option number ' + option.index"
-                  class="col-md-4 col-sm-8 col-xs-10 col-lg-3 col-xl-3 bg-grey-1 rounded-borders"
+                  v-model="question.modelQ"
+                  hint="you need to fill in the question"
+                  :placeholder="'question number ' + question.index"
+                  class="col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
                 />
+                <q-select
+                  v-model="question.type"
+                  hint="Select the question type"
+                  :options="['radio', 'text', 'checkbox', 'textarea','rating']"
+                  class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
+                  @update:model-value="updateOptionsArray(question.index,question.type)"
+                  
+                />
+              </div>
+              <div v-if="question.type==='radio' || question.type==='checkbox'">
+                <div class="row q-my-md" v-for="option in question.options" :key="option.index">
+                  <q-input
+                    v-model="option.modelQ"
+                    hint="you need to fill in the option"
+                    :placeholder="'option number ' + option.index"
+                    class="col-md-4 col-sm-8 col-xs-10 col-lg-3 col-xl-3 rounded-borders"
+                  />
+                  <q-btn
+                    v-if="option.index === question.cptOptions && (question.type==='radio' || question.type==='checkbox')"
+                    flat
+                    dense
+                    icon="add"
+                    label="addOption"
+                    @click="addOption(question.index)"
+                    no-caps
+                  />
+                  <q-btn
+                    v-if="question.options.length>1"
+                    flat
+                    dense
+                    icon="delete"
+                    label="deleteOption"
+                    @click="deleteOption(question.index,option.index)"
+                    no-caps
+                  />
+                </div>
+              </div>
+              <div class="row">
                 <q-btn
-                  v-if="option.index === question.cptOptions && (question.type==='radio' || question.type==='checkbox')"
+                  v-if="question.index === questions[questions.length - 1].index"
                   flat
                   dense
                   icon="add"
-                  label="addOption"
-                  @click="addOption(question.index)"
+                  label="addQuestion"
+                  @click="addQuestion"
                   no-caps
                 />
                 <q-btn
+                  v-if="questions.length>1"
                   flat
                   dense
                   icon="delete"
-                  label="deleteOption"
-                  @click="deleteOption(question.index,option.index)"
+                  label="deleteQuestion"
+                  @click="deleteQuestion(question.index)"
                   no-caps
                 />
               </div>
-            </div>
-            <div class="row">
-              <q-btn
-                v-if="question.index === questions[questions.length - 1].index"
-                flat
-                dense
-                icon="add"
-                label="addQuestion"
-                @click="addQuestion"
-                no-caps
-              />
-              <q-btn
-                flat
-                dense
-                icon="delete"
-                label="deleteQuestion"
-                @click="deleteQuestion(question.index)"
-                no-caps
-              />
             </div>
             <!--<q-separator class ="q-mt-md q-mb-md" v-if="question.index !== questions[questions.length - 1].index" color="black"/>-->
           </div>
@@ -202,7 +184,6 @@
               you need to fill your email first
             </q-tooltip>
           </div>
-        </div>
       </q-card>
     </q-dialog>
   </div>
@@ -221,7 +202,7 @@ export default {
       email:"",
       style:"",
       type:"",
-      cptQuestion: 0,
+      cptQuestion: 1,
       dialogForm: false,
       formData: {},
       changeFormStyle: false,
@@ -249,7 +230,21 @@ export default {
       this.dialogForm = true;
       this.title = "";
       this.email = "";
-      this.questions = [];
+      this.cptQuestion = 1;
+      this.questions = [
+        {
+          index: 1,
+          modelQ: "",
+          type:'radio',
+          cptOptions: 1,
+          options: [
+            {
+              index: 1,
+              modelQ: "",
+            }
+          ],
+        }
+      ];
       this.formId = uuidv4();
     },
     closeDialog() {
@@ -264,8 +259,13 @@ export default {
         index: this.cptQuestion,
         modelQ: "",
         type:'radio',
-        options: [],
-        cptOptions: 0,
+        options: [
+                  {
+                    index: 1,
+                    modelQ: "",
+                  }
+                ],
+        cptOptions: 1,
       });
     },
     deleteQuestion(index) {
@@ -282,6 +282,13 @@ export default {
       if(questionType !== 'radio' && questionType !== 'checkbox'){
         this.questions[questionIndex-1].options = [];
         this.questions[questionIndex-1].cptOptions = 0;
+      }
+      else if(this.questions[questionIndex-1].options.length === 0){
+        this.questions[questionIndex-1].options = [{
+                    index: 1,
+                    modelQ: "",
+                  }];
+        this.questions[questionIndex-1].cptOptions = 1;
       }
     },
     addOption(index){
