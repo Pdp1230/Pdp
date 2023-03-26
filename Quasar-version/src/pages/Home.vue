@@ -20,7 +20,6 @@
       <q-btn icon="edit"   @click="editForm(form)" />
       <q-btn icon="delete" @click="deleteForm(form.id)" />
       <q-btn icon="share"  @click="shareForm(form.url)"/>
-
     </q-item-section>
   </q-item>
 </q-list>
@@ -95,7 +94,7 @@
         </div>
 
           <div v-for="question in questions" :key="question.index">
-            <div class=" q-mt-xl q-ml-md bg-white">
+            <div class="q-mt-xl q-ml-md bg-white">
               <div class="flex row q-mt-xl">
                 <q-input
                   v-model="question.modelQ"
@@ -109,7 +108,6 @@
                   :options="['radio', 'text', 'checkbox', 'textarea','rating']"
                   class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
                   @update:model-value="updateOptionsArray(question.index,question.type)"
-                  
                 />
               </div>
               <div v-if="question.type==='radio' || question.type==='checkbox'">
@@ -140,26 +138,27 @@
                   />
                 </div>
               </div>
-              <div class="row">
-                <q-btn
-                  v-if="question.index === questions[questions.length - 1].index"
-                  flat
-                  dense
-                  icon="add"
-                  label="addQuestion"
-                  @click="addQuestion"
-                  no-caps
-                />
-                <q-btn
-                  v-if="questions.length>1"
-                  flat
-                  dense
-                  icon="delete"
-                  label="deleteQuestion"
-                  @click="deleteQuestion(question.index)"
-                  no-caps
-                />
-              </div>
+              <q-btn
+                v-if="questions.length>1"
+                flat
+                dense
+                icon="delete"
+                label="deleteQuestion"
+                @click="deleteQuestion(question.index)"
+                no-caps
+                class="row"
+              />
+            </div>
+            <div class="q-mt-xl q-ml-md">
+              <q-btn
+                v-if="question.index === questions[questions.length - 1].index"
+                flat
+                dense
+                icon="add"
+                label="addQuestion"
+                @click="addQuestion"
+                no-caps
+              />
             </div>
             <!--<q-separator class ="q-mt-md q-mb-md" v-if="question.index !== questions[questions.length - 1].index" color="black"/>-->
           </div>
@@ -318,171 +317,173 @@ export default {
       } 
     },
     addCssTemplate() {
-  const cssTemplate = `
+      const cssTemplate = `
 
-    form {
-     font-family: Arial, sans-serif;
-          background-color: #f2f2f2;
-        padding: 20px;
-        border-radius: 10px;
-          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-        }
+      form {
+      font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+          padding: 20px;
+          border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+          }
 
-        label {
-          display: block;
-          margin-bottom: 10px;
-          font-weight: bold;
-        }
+          label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+          }
 
-        input[type="text"],
-        textarea {
-          width: 100%;
-          padding: 10px;
-          border: none;
-          border-radius: 5px;
-          background-color: #ffffff;
-          margin-bottom: 20px;
-          box-sizing: border-box;
-        }
+          input[type="text"],
+          textarea {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ffffff;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+          }
 
-        button {
-          background-color: #4CAF50;
-          color: white;
-          border: none;
-          padding: 10px;
-          border-radius: 5px;
-          cursor: pointer;
-        }
+          button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+          }
 
-        button:hover {
-          background-color: #3e8e41;
-        }
+          button:hover {
+            background-color: #3e8e41;
+          }
 
-  `;
-  if(this.style=="")
-  this.style += cssTemplate;
-  },
-  clearStyle() {
-    this.style = "";
-  },
-  submitForm() {
-  const uuid = require("uuid");
-  const formId = uuid.v4();
-  const url = window.location.origin + "/form/" + formId;
-
-  this.formUrl = url;
-
-  const formData = {
-    title: this.title,
-    id: formId,
-    style: this.style,
-    ownersemail: this.ownersemail,
-    email: this.email,
-    url: url,
-    questions: this.questions.map((question) => ({
-      modelQ: question.modelQ,
-      type: question.type,
-      options: question.options.map((option) => ({
-        modelQ: option.modelQ,
-      })),
-    })),
-  };
-
-
-
-  this.formData = {
-    forms: [formData],
-  };
-
-  const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
-  const fileContent = JSON.stringify(this.formData, null, 2);
-  const fileBlob = new Blob([fileContent], { type: "application/json" });
-
-  const fileLink = document.createElement("a");
-  fileLink.href = URL.createObjectURL(fileBlob);
-  fileLink.download = fileName;
-  fileLink.click();
-
-  this.title = "";
-  this.questions = [];
-  this.dialogForm = false;
-  this.formAdd = false;
-  this.cptQuestion = 0;
-
-  const formDataUrl = URL.createObjectURL(fileBlob);
-  fetch(formDataUrl)
-    .then((response) => response.json())
-    .then((data) => {
-      this.formData = data.forms[0]; // Récupérer le premier formulaire dans le tableau de formulaires
-    });
-},
-        editForm(form) {
-  this.dialogForm = true;
-  this.formId = form.id;
-  this.title = form.title;
-  this.email = form.email;
-  this.style = form.style;
-  this.questions = form.questions;
-  this.options = form.options;
-}
-,
-deleteForm(formId) {
-  this.forms = this.forms.filter((form) => form.id !== formId);
-},
-
-
+      `;
+      if(this.style=="")
+        this.style += cssTemplate;
     },
-  };
-  </script>
+    clearStyle() {
+      this.style = "";
+    },
+    submitForm() {
 
-  <style scoped>
+      const uuid = require("uuid");
+      const formId = uuid.v4();
+      const url = window.location.origin + "/form/" + formId;
+
+      this.formUrl = url;
+
+      this.forms.push({
+        title:this.title,
+        email:this.email,
+        url:this.formUrl,
+        questions:this.questions
+      });
+
+      const formData = {
+        title: this.title,
+        id: formId,
+        style: this.style,
+        ownersemail: this.ownersemail,
+        email: this.email,
+        url: url,
+        questions: this.questions.map((question) => ({
+          modelQ: question.modelQ,
+          type: question.type,
+          options: question.options.map((option) => ({
+            modelQ: option.modelQ,
+          })),
+        })),
+      };
+
+      this.formData = {
+        forms: [formData],
+      };
+
+      const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
+      const fileContent = JSON.stringify(this.formData, null, 2);
+      const fileBlob = new Blob([fileContent], { type: "application/json" });
+
+      const fileLink = document.createElement("a");
+      fileLink.href = URL.createObjectURL(fileBlob);
+      //fileLink.download = fileName;
+      //fileLink.click();
+
+      this.title = "";
+      this.questions = [];
+      this.dialogForm = false;
+      this.formAdd = false;
+      this.cptQuestion = 0;
+
+      const formDataUrl = URL.createObjectURL(fileBlob);
+      fetch(formDataUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          this.formData = data.forms[0]; // Récupérer le premier formulaire dans le tableau de formulaires
+        });
+    },
+    editForm(form) {
+      this.dialogForm = true;
+      this.formId = form.id;
+      this.title = form.title;
+      this.email = form.email;
+      this.style = form.style;
+      this.questions = form.questions;
+      this.options = form.options;
+    },
+    deleteForm(formId) {
+      this.forms = this.forms.filter((form) => form.id !== formId);
+    },
+  },
+};
+</script>
+
+<style scoped>
 
   #textbuttons{
     width: 350px;
 
   }
   textarea {
-  margin-top: 10px;
-  margin-left: 50px;
-  width: 500px;
-  height: 100px;
+    margin-top: 10px;
+    margin-left: 50px;
+    width: 500px;
+    height: 100px;
 
-  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.07);
-  border-color: -moz-use-text-color #FFFFFF #FFFFFF -moz-use-text-color;
-  border-image: none;
-  border-radius: 6px 6px 6px 6px;
-  border-style: none solid solid none;
-  border-width: medium 1px 1px medium;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12) inset;
-  color: #555555;
-  font-family: Helveticaf;
-  font-size: 1em;
-  line-height: 1.4em;
-  padding: 5px 8px;
-  transition: background-color 0.2s ease 0s;
-  scrollbar-color: #ccc #f5f5f5;
-  scrollbar-width: thin;
-}
-
-
-#textcss::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-#textcss::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 3px;
-}
-
-#textcss::-webkit-scrollbar-track {
-  background-color: #f5f5f5;
-}
-
-textarea:focus {
-    background: none repeat scroll 0 0 #FFFFFF;
-    outline-width: 0;
-}
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.07);
+    border-color: -moz-use-text-color #FFFFFF #FFFFFF -moz-use-text-color;
+    border-image: none;
+    border-radius: 6px 6px 6px 6px;
+    border-style: none solid solid none;
+    border-width: medium 1px 1px medium;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12) inset;
+    color: #555555;
+    font-family: Helveticaf;
+    font-size: 1em;
+    line-height: 1.4em;
+    padding: 5px 8px;
+    transition: background-color 0.2s ease 0s;
+    scrollbar-color: #ccc #f5f5f5;
+    scrollbar-width: thin;
+  }
 
 
-  </style>
+  #textcss::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  #textcss::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+  }
+
+  #textcss::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+  }
+
+  textarea:focus {
+      background: none repeat scroll 0 0 #FFFFFF;
+      outline-width: 0;
+  }
+
+</style>
