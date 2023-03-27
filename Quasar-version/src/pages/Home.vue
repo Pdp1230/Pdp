@@ -41,7 +41,7 @@
             @click="closeDialog"
           />
         </div>
-        <div class="row col-12 q-ml-md">
+        <div class="row col-12 q-ml-md justify-center">
           <q-input
             placeholder="Titre du formulaire"
             hint="obligatory"
@@ -63,7 +63,7 @@
             class="q-ml-md"
             no-caps/>
         </div>
-        <div v-if="changeFormStyle" class="row justify-bottom q-mt-lg q-mb-md">
+        <div v-if="changeFormStyle" class="row q-mt-lg q-mb-md">
           <textarea 
           id="textcss"
           v-model="style" 
@@ -93,14 +93,16 @@
           </div>
         </div>
 
-          <div v-for="question in questions" :key="question.index">
-            <div class="q-mt-xl q-ml-md bg-white">
-              <div class="flex row q-mt-xl">
+          <div class="q-mt-xl" v-for="question in questions" :key="question.index">
+            <div class="row justify-center q-mt-md q-ml-md">
+              <q-card class="bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6">
+              <q-card-section class="q-mt-sm q-ml-md justify-center">
+                <div class="row q-my-sm">
                 <q-input
                   v-model="question.modelQ"
                   hint="you need to fill in the question"
                   :placeholder="'question number ' + question.index"
-                  class="col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
+                  class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7"
                 />
                 <q-select
                   v-model="question.type"
@@ -110,15 +112,20 @@
                   @update:model-value="updateOptionsArray(question.index,question.type)"
                 />
               </div>
+              </q-card-section>
               <div v-if="question.type==='radio' || question.type==='checkbox'">
-                <div class="row q-my-md" v-for="option in question.options" :key="option.index">
+                <div v-for="option in question.options" :key="option.index">
+                  <q-card-section class="q-ml-md justify-start">
+                    <div class="row">
                   <q-input
                     v-model="option.modelQ"
                     hint="you need to fill in the option"
                     :placeholder="'option number ' + option.index"
-                    class="col-md-4 col-sm-8 col-xs-10 col-lg-3 col-xl-3 rounded-borders"
+                    class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7 rounded-borders"
                   />
-                  <q-btn
+                  </div>
+                  <div class="row q-mt-sm">
+                    <q-btn
                     v-if="option.index === question.cptOptions && (question.type==='radio' || question.type==='checkbox')"
                     flat
                     dense
@@ -137,7 +144,10 @@
                     no-caps
                   />
                 </div>
+                </q-card-section>
+                </div>
               </div>
+              <div class="row justify-center q-my-lg">
               <q-btn
                 v-if="questions.length>1"
                 flat
@@ -149,7 +159,9 @@
                 class="row"
               />
             </div>
-            <div class="q-mt-xl q-ml-md">
+            </q-card>
+            </div>
+            <div class="row justify-center q-mt-lg q-ml-md">
               <q-btn
                 v-if="question.index === questions[questions.length - 1].index"
                 flat
@@ -162,13 +174,13 @@
             </div>
             <!--<q-separator class ="q-mt-md q-mb-md" v-if="question.index !== questions[questions.length - 1].index" color="black"/>-->
           </div>
-          <div class="row justify-center q-mt-lg q-mb-md">
+          <div class="row justify-center q-my-xl">
             <q-btn
               icon="save"
               label="Submit the form"
               color="green"
               @click="submitForm"
-              :disable="!titleValid || !questionsValid || !emailValid" 
+              :disable="!titleValid || !questionsValid || !emailValid"
             />
             <q-tooltip v-if="!titleValid">
               you need to write a title first
@@ -485,5 +497,6 @@ export default {
       background: none repeat scroll 0 0 #FFFFFF;
       outline-width: 0;
   }
+
 
 </style>
