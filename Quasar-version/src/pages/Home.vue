@@ -11,18 +11,18 @@
       </p>
     </div>
     <q-list dense>
-  <q-item v-for="form in forms" :key="form.id">
-    <q-item-section>
-      <q-item-label>{{ form.title }}</q-item-label>
-      <q-item-label caption>{{ form.email }}</q-item-label>
-    </q-item-section>
-    <q-item-section side>
-      <q-btn icon="edit"   @click="editForm(form)" />
-      <q-btn icon="delete" @click="deleteForm(form.id)" />
-      <q-btn icon="share"  @click="shareForm(form.url)"/>
-    </q-item-section>
-  </q-item>
-</q-list>
+      <q-item v-for="form in forms" :key="form.id">
+        <q-item-section>
+          <q-item-label>{{ form.title }}</q-item-label>
+          <q-item-label caption>{{ form.email }}</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn icon="edit" @click="editForm(form)" />
+          <q-btn icon="delete" @click="deleteForm(form.id)" />
+          <q-btn icon="share" @click="shareForm(form.url)" />
+        </q-item-section>
+      </q-item>
+    </q-list>
 
     <q-dialog
       v-model="dialogForm"
@@ -48,12 +48,14 @@
             v-model="title"
             class="col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
           />
-          <q-input 
-            v-model="email" 
-            filled type="email"
-            placeholder="Email" 
+          <q-input
+            v-model="email"
+            filled
+            type="email"
+            placeholder="Email"
             hint="obligatory"
-            class="q-ml-md" />
+            class="q-ml-md"
+          />
           <q-btn
             dense
             icon="style"
@@ -61,14 +63,15 @@
             @click="changeFormStyle = !changeFormStyle"
             flat
             class="q-ml-md"
-            no-caps/>
+            no-caps
+          />
         </div>
         <div v-if="changeFormStyle" class="row q-mt-lg q-mb-md">
-          <textarea 
-          id="textcss"
-          v-model="style" 
-          class="q-input col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"  
-          placeholder="      /* Customize your form here */
+          <textarea
+            id="textcss"
+            v-model="style"
+            class="q-input col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
+            placeholder="      /* Customize your form here */
                                 .q-input {
                                   /* Add custom styles */
                                 }
@@ -78,123 +81,140 @@
                                 /* Add more custom styles as needed */"
           ></textarea>
           <div id="textbuttons">
-            <q-btn 
-            dense icon="style" 
-            label="Add CSS template" 
-            class="q-ml-md"
-            @click="addCssTemplate" />
-
             <q-btn
-            dense
-            icon="clear"
-            class="q-ml-md"
-            @click="clearStyle"
+              dense
+              icon="style"
+              label="Add CSS template"
+              class="q-ml-md"
+              @click="addCssTemplate"
             />
+
+            <q-btn dense icon="clear" class="q-ml-md" @click="clearStyle" />
           </div>
         </div>
 
-          <div class="q-mt-xl" v-for="question in questions" :key="question.index">
-            <div class="row justify-center q-mt-md q-ml-md">
-              <q-card class="bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6">
+        <div
+          class="q-mt-xl"
+          v-for="question in questions"
+          :key="question.index"
+        >
+          <div class="row justify-center q-mt-md q-ml-md">
+            <q-card
+              class="bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6"
+            >
               <q-card-section class="q-mt-sm q-ml-md justify-center">
                 <div class="row q-my-sm">
-                <q-input
-                  v-model="question.modelQ"
-                  hint="you need to fill in the question"
-                  :placeholder="'question number ' + question.index"
-                  class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7"
-                />
-                <q-select
-                  v-model="question.type"
-                  hint="Select the question type"
-                  :options="['radio', 'text', 'checkbox', 'textarea','rating']"
-                  class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
-                  @update:model-value="updateOptionsArray(question.index,question.type)"
-                />
-              </div>
+                  <q-input
+                    v-model="question.modelQ"
+                    hint="you need to fill in the question"
+                    :placeholder="'question number ' + question.index"
+                    class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7"
+                  />
+                  <q-select
+                    v-model="question.type"
+                    hint="Select the question type"
+                    :options="[
+                      'radio',
+                      'text',
+                      'checkbox',
+                      'textarea',
+                      'rating',
+                    ]"
+                    class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
+                    @update:model-value="
+                      updateOptionsArray(question.index, question.type)
+                    "
+                  />
+                </div>
               </q-card-section>
-              <div v-if="question.type==='radio' || question.type==='checkbox'">
+              <div
+                v-if="question.type === 'radio' || question.type === 'checkbox'"
+              >
                 <div v-for="option in question.options" :key="option.index">
                   <q-card-section class="q-ml-md justify-start">
                     <div class="row">
-                  <q-input
-                    v-model="option.modelQ"
-                    hint="you need to fill in the option"
-                    :placeholder="'option number ' + option.index"
-                    class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7 rounded-borders"
-                  />
-                  </div>
-                  <div class="row q-mt-sm">
-                    <q-btn
-                    v-if="option.index === question.cptOptions && (question.type==='radio' || question.type==='checkbox')"
-                    flat
-                    dense
-                    icon="add"
-                    label="addOption"
-                    @click="addOption(question.index)"
-                    no-caps
-                  />
-                  <q-btn
-                    v-if="question.options.length>1"
-                    flat
-                    dense
-                    icon="delete"
-                    label="deleteOption"
-                    @click="deleteOption(question.index,option.index)"
-                    no-caps
-                  />
-                </div>
-                </q-card-section>
+                      <q-input
+                        v-model="option.modelQ"
+                        hint="you need to fill in the option"
+                        :placeholder="'option number ' + option.index"
+                        class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7 rounded-borders"
+                      />
+                    </div>
+                    <div class="row q-mt-sm">
+                      <q-btn
+                        v-if="
+                          option.index === question.cptOptions &&
+                          (question.type === 'radio' ||
+                            question.type === 'checkbox')
+                        "
+                        flat
+                        dense
+                        icon="add"
+                        label="addOption"
+                        @click="addOption(question.index)"
+                        no-caps
+                      />
+                      <q-btn
+                        v-if="question.options.length > 1"
+                        flat
+                        dense
+                        icon="delete"
+                        label="deleteOption"
+                        @click="deleteOption(question.index, option.index)"
+                        no-caps
+                      />
+                    </div>
+                  </q-card-section>
                 </div>
               </div>
               <div class="row justify-center q-my-lg">
-              <q-btn
-                v-if="questions.length>1"
-                flat
-                dense
-                icon="delete"
-                label="deleteQuestion"
-                @click="deleteQuestion(question.index)"
-                no-caps
-                class="row"
-              />
-            </div>
+                <q-btn
+                  v-if="questions.length > 1"
+                  flat
+                  dense
+                  icon="delete"
+                  label="deleteQuestion"
+                  @click="deleteQuestion(question.index)"
+                  no-caps
+                  class="row"
+                />
+              </div>
             </q-card>
-            </div>
-            <div class="row justify-center q-mt-lg q-ml-md">
-              <q-btn
-                v-if="question.index === questions[questions.length - 1].index"
-                flat
-                dense
-                icon="add"
-                label="addQuestion"
-                @click="addQuestion"
-                no-caps
-              />
-            </div>
-            <!--<q-separator class ="q-mt-md q-mb-md" v-if="question.index !== questions[questions.length - 1].index" color="black"/>-->
           </div>
-          <div class="row justify-center q-my-xl">
+          <div class="row justify-center q-mt-lg q-ml-md">
             <q-btn
-              icon="save"
-              label="Submit the form"
-              color="green"
-              @click="submitForm"
-              :disable="!titleValid || !questionsValid || !emailValid"
+              v-if="question.index === questions[questions.length - 1].index"
+              flat
+              dense
+              icon="add"
+              label="addQuestion"
+              @click="addQuestion"
+              no-caps
             />
-            <q-tooltip v-if="!titleValid">
-              you need to write a title first
-            </q-tooltip>
-            <q-tooltip v-if="!emailValid">
-              you need to fill your email first
-            </q-tooltip>
-            <q-tooltip v-if="titleValid && emailValid && !questionsValid">
-              you need to finish your questions first
-            </q-tooltip>
-            <q-tooltip v-if="titleValid && !emailValid && !questionsValid">
-              you need to fill your email first
-            </q-tooltip>
           </div>
+          <!--<q-separator class ="q-mt-md q-mb-md" v-if="question.index !== questions[questions.length - 1].index" color="black"/>-->
+        </div>
+        <div class="row justify-center q-my-xl">
+          <q-btn
+            icon="save"
+            label="Submit the form"
+            color="green"
+            @click="submitForm"
+            :disable="!titleValid || !questionsValid || !emailValid"
+          />
+          <q-tooltip v-if="!titleValid">
+            you need to write a title first
+          </q-tooltip>
+          <q-tooltip v-if="!emailValid">
+            you need to fill your email first
+          </q-tooltip>
+          <q-tooltip v-if="titleValid && emailValid && !questionsValid">
+            you need to finish your questions first
+          </q-tooltip>
+          <q-tooltip v-if="titleValid && !emailValid && !questionsValid">
+            you need to fill your email first
+          </q-tooltip>
+        </div>
       </q-card>
     </q-dialog>
   </div>
@@ -210,9 +230,9 @@ export default {
       questions: [],
       qadd: false,
       title: "",
-      email:"",
-      style:"",
-      type:"",
+      email: "",
+      style: "",
+      type: "",
       cptQuestion: 1,
       dialogForm: false,
       formData: {},
@@ -225,7 +245,8 @@ export default {
       return this.title !== "";
     },
     emailValid() {
-      const emailPattern = /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
+      const emailPattern =
+        /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
       return emailPattern.test(this.email);
     },
     questionsValid() {
@@ -236,7 +257,6 @@ export default {
     },
   },
   methods: {
-    
     addForm() {
       this.dialogForm = true;
       this.title = "";
@@ -246,15 +266,15 @@ export default {
         {
           index: 1,
           modelQ: "",
-          type:'radio',
+          type: "radio",
           cptOptions: 1,
           options: [
             {
               index: 1,
               modelQ: "",
-            }
+            },
           ],
-        }
+        },
       ];
       this.formId = uuidv4();
     },
@@ -269,13 +289,13 @@ export default {
       this.questions.push({
         index: this.cptQuestion,
         modelQ: "",
-        type:'radio',
+        type: "radio",
         options: [
-                  {
-                    index: 1,
-                    modelQ: "",
-                  }
-                ],
+          {
+            index: 1,
+            modelQ: "",
+          },
+        ],
         cptOptions: 1,
       });
     },
@@ -289,44 +309,47 @@ export default {
         }));
       this.cptQuestion -= 1;
     },
-    updateOptionsArray(questionIndex,questionType){
-      if(questionType !== 'radio' && questionType !== 'checkbox'){
-        this.questions[questionIndex-1].options = [];
-        this.questions[questionIndex-1].cptOptions = 0;
-      }
-      else if(this.questions[questionIndex-1].options.length === 0){
-        this.questions[questionIndex-1].options = [{
-                    index: 1,
-                    modelQ: "",
-                  }];
-        this.questions[questionIndex-1].cptOptions = 1;
+    updateOptionsArray(questionIndex, questionType) {
+      if (questionType !== "radio" && questionType !== "checkbox") {
+        this.questions[questionIndex - 1].options = [];
+        this.questions[questionIndex - 1].cptOptions = 0;
+      } else if (this.questions[questionIndex - 1].options.length === 0) {
+        this.questions[questionIndex - 1].options = [
+          {
+            index: 1,
+            modelQ: "",
+          },
+        ];
+        this.questions[questionIndex - 1].cptOptions = 1;
       }
     },
-    addOption(index){
-      this.questions[index-1].cptOptions += 1;
-      this.questions[index-1].options.push({
-        index: this.questions[index-1].cptOptions,
+    addOption(index) {
+      this.questions[index - 1].cptOptions += 1;
+      this.questions[index - 1].options.push({
+        index: this.questions[index - 1].cptOptions,
         modelQ: "",
       });
     },
     deleteOption(indexQuestion, indexOption) {
       let cpt = 1;
-      this.questions[indexQuestion-1].options = this.questions[indexQuestion-1].options
+      this.questions[indexQuestion - 1].options = this.questions[
+        indexQuestion - 1
+      ].options
         .filter((option) => option.index !== indexOption)
         .map((option) => ({
           ...option,
           index: cpt++,
         }));
-      this.questions[indexQuestion-1].cptOptions -= 1;
+      this.questions[indexQuestion - 1].cptOptions -= 1;
     },
     shareForm(url) {
       if (navigator.share) {
         navigator.share({
-          url: url
+          url: url,
         });
       } else {
         window.prompt("Copy the URL below to share the form:", url);
-      } 
+      }
     },
     addCssTemplate() {
       const cssTemplate = `
@@ -370,14 +393,12 @@ export default {
           }
 
       `;
-      if(this.style=="")
-        this.style += cssTemplate;
+      if (this.style == "") this.style += cssTemplate;
     },
     clearStyle() {
       this.style = "";
     },
     submitForm() {
-
       const uuid = require("uuid");
       const formId = uuid.v4();
       const url = window.location.origin + "/form/" + formId;
@@ -385,10 +406,10 @@ export default {
       this.formUrl = url;
 
       this.forms.push({
-        title:this.title,
-        email:this.email,
-        url:this.formUrl,
-        questions:this.questions
+        title: this.title,
+        email: this.email,
+        url: this.formUrl,
+        questions: this.questions,
       });
 
       const formData = {
@@ -450,53 +471,48 @@ export default {
 </script>
 
 <style scoped>
+#textbuttons {
+  width: 350px;
+}
+textarea {
+  margin-top: 10px;
+  margin-left: 50px;
+  width: 500px;
+  height: 100px;
 
-  #textbuttons{
-    width: 350px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.07);
+  border-color: -moz-use-text-color #ffffff #ffffff -moz-use-text-color;
+  border-image: none;
+  border-radius: 6px 6px 6px 6px;
+  border-style: none solid solid none;
+  border-width: medium 1px 1px medium;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12) inset;
+  color: #555555;
+  font-family: Helveticaf;
+  font-size: 1em;
+  line-height: 1.4em;
+  padding: 5px 8px;
+  transition: background-color 0.2s ease 0s;
+  scrollbar-color: #ccc #f5f5f5;
+  scrollbar-width: thin;
+}
 
-  }
-  textarea {
-    margin-top: 10px;
-    margin-left: 50px;
-    width: 500px;
-    height: 100px;
+#textcss::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
-    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.07);
-    border-color: -moz-use-text-color #FFFFFF #FFFFFF -moz-use-text-color;
-    border-image: none;
-    border-radius: 6px 6px 6px 6px;
-    border-style: none solid solid none;
-    border-width: medium 1px 1px medium;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12) inset;
-    color: #555555;
-    font-family: Helveticaf;
-    font-size: 1em;
-    line-height: 1.4em;
-    padding: 5px 8px;
-    transition: background-color 0.2s ease 0s;
-    scrollbar-color: #ccc #f5f5f5;
-    scrollbar-width: thin;
-  }
+#textcss::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
 
+#textcss::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+}
 
-  #textcss::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  #textcss::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 3px;
-  }
-
-  #textcss::-webkit-scrollbar-track {
-    background-color: #f5f5f5;
-  }
-
-  textarea:focus {
-      background: none repeat scroll 0 0 #FFFFFF;
-      outline-width: 0;
-  }
-
-
+textarea:focus {
+  background: none repeat scroll 0 0 #ffffff;
+  outline-width: 0;
+}
 </style>
