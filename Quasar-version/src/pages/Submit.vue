@@ -27,12 +27,14 @@
 
 <script>
 import RadioList from "../components/RadioList.vue";
+import CheckboxList from "../components/CheckboxList.vue";
 import { ref } from 'vue';
 import axios from 'axios';
 export default {
   name: "formResponse",
   components: {
     RadioList,
+    CheckboxList,
   },
   data() {
     return {
@@ -68,7 +70,7 @@ export default {
             question.options = this.questionOptions;
             break;
           case "checkbox":
-          question.component = "q-checkbox";
+          question.component = "CheckboxList";
             if (!question.response) {
               question.response = {
                 value: null,
@@ -103,7 +105,6 @@ export default {
         }
       });
     });
-    // create the questionOptions array
     // create the questionOptions array
     this.questionOptions = Array.from(optionsMap).map(([modelQ, options]) => {
       return {
