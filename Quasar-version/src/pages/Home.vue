@@ -192,7 +192,6 @@
               no-caps
             />
           </div>
-          <!--<q-separator class ="q-mt-md q-mb-md" v-if="question.index !== questions[questions.length - 1].index" color="black"/>-->
         </div>
         <div class="row justify-center q-my-xl">
           <q-btn
@@ -202,6 +201,8 @@
             @click="submitForm"
             :disable="!titleValid || !questionsValid || !emailValid"
           />
+<!--todo: if question type has options, options should be valid in order to submit-->
+
           <q-tooltip v-if="!titleValid">
             you need to write a title first
           </q-tooltip>
@@ -462,6 +463,7 @@ export default {
       this.style = form.style;
       this.questions = form.questions;
       this.options = form.options;
+      //todo: submit only when form is changed, submit doesn't create a new form, modifies the existing form instead
     },
     deleteForm(formId) {
       this.forms = this.forms.filter((form) => form.id !== formId);
