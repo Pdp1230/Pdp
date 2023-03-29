@@ -93,7 +93,7 @@ Les alternatives existantes pour les questionnaires et les sondages incluent Goo
 \item Envoi automatique d'un mail à la fin du remplissage.
 \begin{itemize}[noitemsep]
     \item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
-    \item \textbf{Vitesse : }Rapide. Il ne semble pas nécessaire que l'envoi soit instantané, mais il ne faut pas non plus qu'il ait lieu plusieurs heures après l'envoi des réponses au questionnaire. Au plus quelques minutes de latence.
+    \item \textbf{Vitesse : }Rapide, moins de 2 minutes. Il ne semble pas nécessaire que l'envoi soit instantané, mais il ne faut pas non plus qu'il ait lieu plusieurs heures après l'envoi des réponses au questionnaire. Au plus quelques minutes de latence.
     \item \textbf{Robustesse : }Relativement importante. L'e-mail peut servir comme confirmation que le questionnaire a bien été rempli ou avoir d'autres utilités, il faut être quasi-certain qu'un questionnaire rempli implique un e-mail envoyé (à la bonne personne).
     \item \textbf{Faisabilité : }Oui, il est possible d'automatiser l'envoi de mails personnalisés.
     \item \textbf{Difficultés techniques: } Gérer les cas de mauvaises adresses mail ou de réponses, par exemple.
@@ -101,10 +101,10 @@ Les alternatives existantes pour les questionnaires et les sondages incluent Goo
 \item Import/export de fichiers texte (JSON).
 \begin{itemize}[noitemsep]
     \item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
-    \item \textbf{Vitesse : }Très rapide. Il ne doit pas se passer plusieurs minutes entre l'import d'un fichier et la création du questionnaire associé, autrement autant le faire "à la main".
+    \item \textbf{Vitesse : }Très rapide, pas plus de 2 secondes. Il ne doit pas se passer plusieurs minutes entre l'import d'un fichier et la création du questionnaire associé, autrement autant le faire "à la main".
     \item \textbf{Robustesse : }Relativement importante, on veut que les questionnaires soient bien générés en accord avec les fichiers texte importés. Il peut y avoir des bugs tant qu'ils ne rendent pas l'application inutilisable et qu'ils ne compromettent pas les autres applications potentielles de l'utilisateur. De même, il ne faut pas que les bugs soient récurrents et si de tels bugs surviennent, il faut que l'utilisateur puisse importer son fichier sans trop attendre (rafraîchir la page, par exemple).
     \item \textbf{Faisabilité : }Oui, implémenté dans des prototypes.
-    \item \textbf{Difficultés techniques: } La transcription texte => code et code => texte qui se doit d'être relativement unique, on aimerait pouvoir produire une bijection.
+    \item \textbf{Difficultés techniques: } La transcription texte vers code et code vers texte qui se doit d'être relativement unique, on aimerait pouvoir produire une bijection.
 \end{itemize}
 \end{enumerate}
 
