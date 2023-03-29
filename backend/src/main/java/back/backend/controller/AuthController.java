@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.core.AuthenticationException;
+
 
 import java.util.Collections;
 
@@ -33,20 +36,26 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/signin")
+    @CrossOrigin(origins = "http://localhost:8081")
     public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto){
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginDto.getEmail(), loginDto.getPassword()));
+        try{
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginDto.getEmail(), loginDto.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("User signed-in successfully!.", HttpStatus.OK);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return ResponseEntity.ok().body("User " + loginDto.getEmail() + " signed-in successfully!");
+        } catch(AuthenticationException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong e-mail or password!");
+        }
     }
 
     @PostMapping("/signup")
+    @CrossOrigin(origins = "http://localhost:8081")
     public ResponseEntity<String> registerUser(@RequestBody SignUpDto signUpDto){
 
         // add check for email exists in DB
         if(userRepository.existsByEmail(signUpDto.getEmail())){
-            return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body("Email " + signUpDto.getEmail() + " is already taken!");
         }
 
         // create user object
@@ -58,8 +67,6 @@ public class AuthController {
 
         userRepository.save(user);
 
-        return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
-
+        return ResponseEntity.ok().body(signUpDto.getEmail()+" signed up successfully");
     }
-    
 }
