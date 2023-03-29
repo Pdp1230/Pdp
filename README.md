@@ -109,6 +109,21 @@ quasar build
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js).
 
 
-## Pre Requirements FrontEnd
 
-todo...
+
+## Pre Requirements Backend
+### Spring Boot Building Installation API
+- JDK 17
+- Maven 3.6.3
+- MySQL 8
+
+### Build the project:
+```bash
+mvn clean install
+```
+### Run the application:
+```bash
+mvn spring-boot:run
+```
+
+The API will now be available at `http://localhost:8081`.
