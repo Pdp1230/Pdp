@@ -117,6 +117,14 @@ See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-webpack/quas
 - Maven 3.6.3
 - MySQL 8
 
+### Launching MySQL
+```bash
+mysql -u root -p[password]
+
+```
+Note: Replace [password] with your actual MySQL password when using the command.
+
+
 ### Build the project:
 ```bash
 mvn clean install
