@@ -134,4 +134,4 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-The API will now be available at `http://localhost:8081`.
+The API should be started before the frontend server,it will now be available at `http://localhost:8080`, and the frontend at `http://localhost:8081`
