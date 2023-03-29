@@ -1,7 +1,7 @@
 <template>
     <q-page class="bg-grey-2">
       <div class="row justify-center">
-        <q-card class="bg-grey-3 q-mt-md" :style="cardStyle">
+        <q-card class="bg-grey-3 q-mt-md col-md-4 col-sm-7 col-xs-10 col-lg-3 col-xl-3">
           <q-card-section class="row justify-center text-bold">
             Login to your account
           </q-card-section>
@@ -50,7 +50,7 @@
           </q-card-section>
           <q-card-section class="row justify-center">
             <q-btn
-              padding="0.25rem 7rem"
+              :style="signUpButtonStyle"
               label="Sign up"
               dense
               color="blue"
@@ -152,8 +152,8 @@
     computed: {
       cardStyle() {
         return {
-          minWidth: "60vh",
-          maxWidth: "70vh",
+          width: "50vh",
+          height: "70vh"
         };
       },
       signUpStyle() {
@@ -163,6 +163,11 @@
           minHeight: "50vh",
           maxHeight: "60hv",
         };
+      },
+      signUpButtonStyle(){
+        return{
+          width: "80%"
+        }
       },
       isFirstNameValid() {
         return this.fields[0].value.length > 1;
@@ -182,8 +187,21 @@
       },
     },
     methods: {
-      triggerLogin() {
-        //todo api call in order to check if user has an account, if yes load his data
+      async triggerLogin() {
+        const data = {
+          email:this.emailSI,
+          password:this.passwordSI
+        };
+
+        const response = await fetch('http://localhost:8080/api/auth/signin', {
+          method: 'POST',
+          headers:{
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        const responseData = await response.text();
+        console.log(responseData);
       },
       addUser() {
         this.dialogForm = true;
@@ -194,9 +212,26 @@
           field.value = "";
         });
       },
-      triggerSignUp() {
+      
+      async triggerSignUp() {
+
+        const data = {
+          name:this.fields[0].value,
+          surname:this.fields[1].value,
+          email:this.fields[2].value,
+          password:this.fields[3].value
+        };
+
+        const response = await fetch('http://localhost:8080/api/auth/signup', {
+          method: 'POST',
+          headers:{
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        const responseData = await response.text();
+        console.log(responseData);
         this.closeDialog();
-        //todo api call in order to register new user
       },
     },
   };
