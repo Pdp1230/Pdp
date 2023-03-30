@@ -7,7 +7,6 @@
 
 \begin{document}
 
-\maketitle
 
 \section{Introduction}
 Ce document a pour but de décrire les besoins pour un logiciel de questionnaire/sondage avec des fonctionnalités spécifiques manquantes dans la plupart des alternatives existantes. Ce projet est réalisé dans le cadre de l'UE de projet de programmation du master informatique de l'université de Bordeaux.
@@ -25,7 +24,6 @@ Il n'est pas question de rivaliser avec les alternatives existantes, mais plutô
 
 \section{Description de l'existant}
 Les alternatives existantes pour les questionnaires et les sondages incluent Google Forms, LimeSurvey, Microsoft Forms, Survey Monkey, Framaforms, etc.
-
 \section{Description des besoins}
 \subsection{Non fonctionnels}
 \begin{enumerate}[noitemsep]
@@ -49,6 +47,7 @@ Les alternatives existantes pour les questionnaires et les sondages incluent Goo
 \item \textbf{Faisabilité : }Oui, modifier la mise en page d'un site est loin d'être impossible, d'autant plus qu'ici cela vise une variété restreinte d'objets. Si ces objets sont bien structurés, il ne devrait y avoir aucun mal à les composer entre eux et de faire en sorte que leurs aspects n'interagissent pas négativement entre eux.
 \item \textbf{Difficultés techniques: } D'une part, l'insertion de code et d'autre part, faire en sorte que le questionnaire reste cohérent avec cette injection. Il faut faire attention à bien séparer l'affichage du reste du code et qu'il ne puisse pas y avoir d'effets indésirables. Il faudra aussi s'assurer de la cohérence de l'affichage du questionnaire peu importe les personnalisation apportées par l'utilisateur.
 \end{itemize}
+\newpage
 \item Versions téléphone.
 \begin{itemize}[noitemsep]
 \item \textbf{Priorités : }Bonus. Non nécessaire et non spécifié, mais intéressant tout de même.
@@ -67,8 +66,6 @@ Les alternatives existantes pour les questionnaires et les sondages incluent Goo
 \item \textbf{Difficultés techniques: } Injection de code "en temps réel" par l'utilisateur.
 \end{itemize}
 
-\end{enumerate}
-
 \item Récupérer les données d'un questionnaire.
 \begin{itemize}[noitemsep]
     \item \textbf{Priorités : }Essentiel. Propriété nécessaire, sans cela il n'y a pas de site.
@@ -76,14 +73,17 @@ Les alternatives existantes pour les questionnaires et les sondages incluent Goo
     \item \textbf{Faisabilité : }Oui.
     \item \textbf{Difficultés techniques: } Récupérer les informations de plusieurs utilisateurs "répondant", et cela sur une plage horaire arbitraire. Rassembler ces données en une structure lisible et accessible seulement par le créateur du questionnaire.
 \end{itemize}
+\newpage
 \item Plusieurs types de réponse :
 \begin{enumerate}[noitemsep]
     \item ordre de préférence entre plusieurs choix.
     \item réponse texte.
-    \item réponse oui/non..
+    \item réponse oui/non.
     \item case à cocher.
     \item tableaux.
-    \item autre...
+    \item classement
+    \item autres...
+\end{enumerate}
 
 \begin{itemize}[noitemsep]
     \item \textbf{Priorités : }Essentiel. Propriété nécessaire, il n'est pas question de faire des questionnaires n'ayant que des réponses oui/non. La première fonctionnalité du cahier des charges est de pouvoir établir un ordre entre plusieurs choix, il faut au moins cela.
@@ -98,6 +98,7 @@ Les alternatives existantes pour les questionnaires et les sondages incluent Goo
     \item \textbf{Faisabilité : }Oui, il est possible d'automatiser l'envoi de mails personnalisés.
     \item \textbf{Difficultés techniques: } Gérer les cas de mauvaises adresses mail ou de réponses, par exemple.
 \end{itemize}
+\newpage
 \item Import/export de fichiers texte (JSON).
 \begin{itemize}[noitemsep]
     \item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
