@@ -3,15 +3,33 @@
     <div v-if="formData" class="form-wrapper" :style="formStyle">
       <h1 class="form-title">{{ formData.forms[0].title }}</h1>
       <form class="form" @submit.prevent="submitForm">
-        <div v-for="(question, index) in formData.forms[0].questions" :key="index" class="form-question">
-          <label class="form-label">{{ question.modelQ }}</label>
-          <br>
-          <component :is="question.component" v-model="question.response.value" :options="question.options"
-            class="form-input">
-            <template #option="{ option }">
-              {{ option.modelQ }}
-            </template>
-          </component>
+        <div v-for="(question, index) in formData.forms[0]?.questions" :key="index">
+          <div
+            class="form-question"
+            :class="{ 'dragging': dragging && dragIndex === index, 'over': dragging && targetIndex === index }"
+            draggable="true"
+            @dragstart="startDrag(event, index)"
+            @dragover.prevent="dragOver(index)"
+            @dragend="stopDrag"
+            @drop.prevent="drop(index)"
+          >
+            <div class="drag-handle">
+            <label class="form-label">{{ question.modelQ }}</label>
+            <br />
+            <component
+              :is="question.component"
+              v-model="question.response.value"
+              :options="question.options"
+              class="form-input"
+            >
+              <template #option="{ option }">{{ option.modelQ }}</template>
+            </component>
+            <div class="question-controls">
+              <q-btn  class="up-button" :disabled="index === 0" icon="arrow_circle_up" @click="moveQuestionUp(index)"/>
+            <q-btn  class="down-button" :disabled="index === formData.forms[0].questions.length - 1"  icon="arrow_circle_down" @click="moveQuestionDown(index)"/>
+    </div>
+          </div>
+        </div>
         </div>
         <div class="form-email">
           <label class="form-label">Email Address</label>
@@ -25,7 +43,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import RadioList from "../components/RadioList.vue";
 import CheckboxList from "../components/CheckboxList.vue";
@@ -34,6 +51,7 @@ import axios from 'axios';
 
 const API_KEY = 'IH79QZN58E4AWj9cnyiVS';
 const SENDGRID_ENDPOINT = 'https://api.sendgrid.com/v3/mail/send';
+
 export default {
   name: "formResponse",
   components: {
@@ -47,10 +65,73 @@ export default {
       formStyle: "",
       userEmail: "",
       group: [],
+      dragging: false,
+      dragIndex: null,
+      targetIndex: null,
     };
   },
+  computed: {},
   methods: {
+
+
+
+
+    moveQuestionUp(index) {
+      const questions = this.formData.forms[0].questions;
+      const temp = questions[index - 1];
+      questions[index - 1] = questions[index];
+      questions[index] = temp;
+    },
+    moveQuestionDown(index) {
+      const questions = this.formData.forms[0].questions;
+      const temp = questions[index + 1];
+      questions[index + 1] = questions[index];
+      questions[index] = temp;
+    },
+
+    startDrag(event, index) {
+  this.dragging = true;
+  this.dragIndex = index;
+  event.dataTransfer.setData("text/plain", index);
+  // Make a copy of the questions array
+  this.group = [...this.formData.forms[0].questions];
+},
+dragOver(index) {
+  if (index !== this.dragIndex) {
+    // Update the target index
+    this.targetIndex = index;
+    // Swap the positions of the questions in the group array
+    const temp = this.group[index];
+    this.group[index] = this.group[this.dragIndex];
+    this.group[this.dragIndex] = temp;
+    // Update the form style to visually represent the dragging and dropping of the questions
+    this.formStyle = `
+      transform: translateY(${(index - this.dragIndex) * 70}px);
+      transition: transform 150ms;
+    `;
+  }
+},
+    stopDrag() {
+      this.dragging = false;
+      this.dragIndex = null;
+      this.targetIndex = null;
+      this.formStyle = "";
+    },
+    drop(index) {
+  // Update the order of the questions in the form data
+  const question = this.group.splice(this.dragIndex, 1)[0];
+  this.group.splice(index, 0, question);
+  this.formData.forms[0].questions = this.group;
+
+  this.group = [];
+  this.dragging = false;
+  this.dragIndex = null;
+  this.targetIndex = null;
+},
+
+
     loadFormData(event) {
+      
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.readAsText(file);
@@ -130,7 +211,8 @@ export default {
         this.formStyle = "";
       };
     },
-
+     // Todo Pouvoir classé les questions par importance si non classé 
+    // RENVOYé TOUTE LES RéPONSE DANS LE DATABASE 
     async submitFormbackend() {
       const formData = this.formData.forms[0];
       const data = formData.questions.reduce((acc, question) => {
@@ -183,3 +265,27 @@ export default {
   },
 };
 </script>
+<style>
+ .up-button,
+  .down-button {
+    font-size: 0.7rem;
+    padding: 0.25rem;
+    margin: 0 0.25rem;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+
+  .up-button:hover,
+  .down-button:hover {
+    background-color: #2980b9;
+    cursor: pointer;
+  }
+</style>
