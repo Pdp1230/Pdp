@@ -12,6 +12,7 @@
 
 ## FRONT-END
 
+- [ ] Add 'classement' question type.
 - [ ] Create a component for each question type, and use them in the home dialog window.
 - [ ] Fix editing a form bug: submit should be disabled if form doesn't have any active changes
 - [ ] Fix editing a form bug: when submitting after editing an existing form, a new form is created which is wrong, the right use of edit is to modify the edited form and not create a new one.
