@@ -1,7 +1,6 @@
 package back.backend.repository;
 
 import back.backend.entity.User;
-import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

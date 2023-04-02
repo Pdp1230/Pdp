@@ -37,7 +37,7 @@
                     label="logout"
                     icon="logout"
                     color="warning"
-                    :to="{ name: 'Login' }"
+                    @click="logout"
                   >
                   </q-btn>
                 </q-card-section>
@@ -134,6 +134,31 @@ export default {
   methods: {
     goToHome() {
       this.$router.push({ name: "Home" });
+    },
+    async logout() {
+      const authToken = sessionStorage.getItem('authToken');
+
+      if(authToken != null){
+        try {
+          const response = await fetch('http://localhost:8080/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('Logout failed.');
+          }
+          else{
+            sessionStorage.removeItem('authToken');
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      this.$router.push({ name: "Login" });
     },
   },
 };

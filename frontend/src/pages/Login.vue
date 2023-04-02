@@ -199,9 +199,14 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(data)
-        })
-        const responseData = await response.text();
-        console.log(responseData);
+        });
+        if(!response.ok)
+          console.log("failed to login");
+        else{
+          const responseData = await response.json();
+          sessionStorage.setItem('authToken', responseData.token);
+          this.$router.push({ name: "Home" });
+        }
       },
       addUser() {
         this.dialogForm = true;
@@ -216,8 +221,8 @@
       async triggerSignUp() {
 
         const data = {
-          name:this.fields[0].value,
-          surname:this.fields[1].value,
+          firstname:this.fields[0].value,
+          lastname:this.fields[1].value,
           email:this.fields[2].value,
           password:this.fields[3].value
         };

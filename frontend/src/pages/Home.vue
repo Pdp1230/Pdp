@@ -408,6 +408,7 @@ export default {
 
       this.forms.push({
         title: this.title,
+        style: this.style,
         email: this.email,
         url: this.formUrl,
         questions: this.questions,
@@ -439,8 +440,8 @@ export default {
 
       const fileLink = document.createElement("a");
       fileLink.href = URL.createObjectURL(fileBlob);
-      //fileLink.download = fileName;
-      //fileLink.click();
+      fileLink.download = fileName;
+      fileLink.click();
 
       this.title = "";
       this.questions = [];
