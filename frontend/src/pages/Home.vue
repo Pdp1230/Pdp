@@ -400,40 +400,26 @@ export default {
       this.style = "";
     },
     submitForm() {
-      const uuid = require("uuid");
-      const formId = uuid.v4();
-      const url = window.location.origin + "/form/" + formId;
-
-      this.formUrl = url;
-
-      this.forms.push({
-        title: this.title,
-        style: this.style,
-        email: this.email,
-        url: this.formUrl,
-        questions: this.questions,
-      });
-
-      const formData = {
-        title: this.title,
-        id: formId,
-        style: this.style,
-        ownersemail: this.ownersemail,
-        email: this.email,
-        url: url,
-        questions: this.questions.map((question) => ({
-          modelQ: question.modelQ,
-          type: question.type,
-          options: question.options.map((option) => ({
-            modelQ: option.modelQ,
-          })),
-        })),
-      };
-
-      this.formData = {
-        forms: [formData],
-      };
-
+    const uuid = require("uuid");
+  const formId = uuid.v4();
+  const formIndex = this.forms.findIndex((form) => form.id === this.formId);
+  const form = {
+    id: formId,
+    title: this.title,
+    email: this.email,
+    questions: this.questions,
+    style: this.style,
+  };
+  if (formIndex > -1) {
+    if (JSON.stringify(form) === JSON.stringify(this.forms[formIndex])) {
+      alert("No changes were made to the form.");
+      return;
+    }
+    this.forms.splice(formIndex, 1, form);
+  } else {
+    this.forms.push(form);
+  }
+  this.formUrl = window.location.href.split("?")[0] + "?form=" + formId;
       const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
       const fileContent = JSON.stringify(this.formData, null, 2);
       const fileBlob = new Blob([fileContent], { type: "application/json" });
@@ -448,6 +434,7 @@ export default {
       this.dialogForm = false;
       this.formAdd = false;
       this.cptQuestion = 0;
+      this.isEditForm = false;
 
       const formDataUrl = URL.createObjectURL(fileBlob);
       fetch(formDataUrl)
