@@ -133,7 +133,7 @@ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'newpassw
 FLUSH PRIVILEGES;
 EXIT;
 ```
-If you choose a password other than 'newpassword' you should update your resources/application.properies file.
+If you choose a password other than 'newpassword' you should update your resources/application.properies file with your password because our backend application needs access to create and update the users database.
 
 Then connect to your MySQL server and create a database with the name users Before running spring-boot:
 ```bash
