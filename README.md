@@ -118,11 +118,27 @@ See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-webpack/quas
 - MySQL 8
 
 ### Launching MySQL
+After installing MySql run:
 ```bash
-mysql -u root -p[password]
-
+sudo mysql -u root
+```
+Then type this to set a root password:
+```bash
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'newpassword';
+FLUSH PRIVILEGES;
+EXIT;
+```
+If you choose a password other than 'newpassword' you should update your resources/application.properies file.
+Then connect to your MySQL server:
+```bash
+mysql -u root -p [password]
 ```
 Note: Replace [password] with your actual MySQL password when using the command.
+
+Before running spring-boot server, create a database with the name users:
+```bash
+CREATE DATABASE users;
+```
 
 
 ### Build the project:
