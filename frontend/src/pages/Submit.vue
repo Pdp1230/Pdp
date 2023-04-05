@@ -12,7 +12,7 @@
             @dragstart="startDrag(event, index)"
             @dragover.prevent="dragOver(event, index)"
             @dragend="stopDrag"
-            @drop.prevent="drop(event, index)"
+            @drop.prevent="drop(index)"
           >
             <div class="drag-handle">
               <label class="form-label">{{ question.modelQ }}</label>
@@ -90,26 +90,23 @@ export default {
       this.dragIndex = index;
     },
     stopDrag() {
-      this.dragging = false;
-      this.dragIndex = null;
-      this.targetIndex = null;
+  this.dragging = false;
+  this.dragIndex = null;
+  this.targetIndex = null;
     },
     dragOver(event, index) {
+      //event.preventDefault();
       this.targetIndex = index;
     },
     drop(index) {
-      if (this.targetIndex !== null) {
-        const questions = [...this.formData.forms[0].questions];
-        const [removed] = questions.splice(this.dragIndex, 1);
-        const dropIndex = index > this.dragIndex ? index - 1 : index;
-        questions.splice(dropIndex, 0, removed);
-        this.formData.forms[0].questions = questions;
-        this.dragging = false;
-        this.dragIndex = dropIndex;
-        this.targetIndex = null;
-      }
-    },
-
+      const questions = this.formData.forms[0].questions;
+      const temp = questions[this.dragIndex];
+      questions.splice(this.dragIndex, 1);
+      questions.splice(index, 0, temp);
+      this.dragging = false;
+      this.dragIndex = null;
+      this.targetIndex = null;
+},
 
     loadFormData(event) {
       
