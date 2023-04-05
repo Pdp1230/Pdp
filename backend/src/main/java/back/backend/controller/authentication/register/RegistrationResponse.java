@@ -1,4 +1,4 @@
-package back.backend.controller;
+package back.backend.controller.authentication.register;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationRequest {
-
-  private String email;
-  String password;
+public class RegistrationResponse {
+    
+    private String message;
 }

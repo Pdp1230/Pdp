@@ -401,47 +401,46 @@ export default {
     },
     submitForm() {
     const uuid = require("uuid");
-  const formId = uuid.v4();
-  const formIndex = this.forms.findIndex((form) => form.id === this.formId);
-  const form = {
-    id: formId,
-    title: this.title,
-    email: this.email,
-    questions: this.questions,
-    style: this.style,
-  };
-  if (formIndex > -1) {
-    if (JSON.stringify(form) === JSON.stringify(this.forms[formIndex])) {
-      alert("No changes were made to the form.");
-      return;
+    const formId = uuid.v4();
+    const formIndex = this.forms.findIndex((form) => form.id === this.formId);
+    const form = {
+      id: formId,
+      title: this.title,
+      email: this.email,
+      questions: this.questions,
+      style: this.style,
+    };
+    if (formIndex > -1) {
+      if (JSON.stringify(form) === JSON.stringify(this.forms[formIndex])) {
+        alert("No changes were made to the form.");
+        return;
+      }
+      this.forms.splice(formIndex, 1, form);
+    } else {
+      this.forms.push(form);
     }
-    this.forms.splice(formIndex, 1, form);
-  } else {
-    this.forms.push(form);
-  }
-  this.formUrl = window.location.href.split("?")[0] + "?form=" + formId;
-      const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
-      const fileContent = JSON.stringify(this.formData, null, 2);
-      const fileBlob = new Blob([fileContent], { type: "application/json" });
+    this.formUrl = window.location.href.split("?")[0] + "?form=" + formId;
+    const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
+    const fileContent = JSON.stringify(this.formData, null, 2);
+    const fileBlob = new Blob([fileContent], { type: "application/json" });
+    const fileLink = document.createElement("a");
+    fileLink.href = URL.createObjectURL(fileBlob);
+    fileLink.download = fileName;
+    fileLink.click();
 
-      const fileLink = document.createElement("a");
-      fileLink.href = URL.createObjectURL(fileBlob);
-      fileLink.download = fileName;
-      fileLink.click();
+    this.title = "";
+    this.questions = [];
+    this.dialogForm = false;
+    this.formAdd = false;
+    this.cptQuestion = 0;
+    this.isEditForm = false;
 
-      this.title = "";
-      this.questions = [];
-      this.dialogForm = false;
-      this.formAdd = false;
-      this.cptQuestion = 0;
-      this.isEditForm = false;
-
-      const formDataUrl = URL.createObjectURL(fileBlob);
-      fetch(formDataUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          this.formData = data.forms[0]; // Récupérer le premier formulaire dans le tableau de formulaires
-        });
+    const formDataUrl = URL.createObjectURL(fileBlob);
+    fetch(formDataUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        this.formData = data.forms[0]; // Récupérer le premier formulaire dans le tableau de formulaires
+      });
     },
     editForm(form) {
       this.dialogForm = true;

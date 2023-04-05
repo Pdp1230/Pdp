@@ -1,4 +1,4 @@
-package back.backend.controller;
+package back.backend.controller.forms.option;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegistrationResponse {
-    
-    private String message;
+public class OptionResponse {
+    private String modelQ;
+    private Integer index;
 }

@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
-import java.util.List;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -31,8 +29,18 @@ public class User implements UserDetails{
     private String email;
     private String password;
 
+    @Column(nullable = false, columnDefinition = "int default 1")
+    public int users_order;
+
     @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
+    private Token[] tokens;
+
+    @OneToMany(mappedBy = "user")
+    private Form[] forms;
+
+    public long getId(){
+        return id;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
