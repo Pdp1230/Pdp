@@ -3,35 +3,38 @@
     <div v-if="formData" class="form-wrapper" :style="formStyle">
       <h1 class="form-title">{{ formData.forms[0].title }}</h1>
       <form class="form" @submit.prevent="submitForm">
-        <div v-for="(question, index) in formData.forms[0]?.questions" :key="index">
-          <div
+        <transition-group name="question-transition" tag="div" class="question-list">
+          <div v-for="(question, index) in formData.forms[0]?.questions" :key="index">
+            <div
             class="form-question"
-            :class="{ 'dragging': dragging && dragIndex === index, 'over': dragging && targetIndex === index }"
+            :class="{ 'dragging': dragging && dragIndex === index, 'over': hovering === index }"
             draggable="true"
             :data-question-index="index"
             @dragstart="startDrag(event, index)"
             @dragover.prevent="dragOver(event, index)"
             @dragend="stopDrag"
             @drop.prevent="drop(index)"
-          >
-            <div class="drag-handle">
-              <label class="form-label">{{ question.modelQ }}</label>
-              <br />
-              <component
-                :is="question.component"
-                v-model="question.response.value"
-                :options="question.options"
-                class="form-input"
-              >
-                <template #option="{ option }">{{ option.modelQ }}</template>
-              </component>
-              <div class="question-controls">
-                <q-btn class="up-button" :disabled="index === 0" icon="arrow_circle_up" @click="moveQuestionUp(index)" />
-                <q-btn class="down-button" :disabled="index === formData.forms[0].questions.length - 1" icon="arrow_circle_down" @click="moveQuestionDown(index)" />
+            @dragenter="dragEnter(index)"
+            >
+              <div class="drag-handle">
+                <label class="form-label">{{ question.modelQ }}</label>
+                <br />
+                <component
+                  :is="question.component"
+                  v-model="question.response.value"
+                  :options="question.options"
+                  class="form-input"
+                >
+                  <template #option="{ option }">{{ option.modelQ }}</template>
+                </component>
+                <div class="question-controls">
+                  <q-btn class="up-button" :disabled="index === 0" icon="arrow_circle_up" @click="moveQuestionUp(index)" />
+                  <q-btn class="down-button" :disabled="index === formData.forms[0].questions.length - 1" icon="arrow_circle_down" @click="moveQuestionDown(index)" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </transition-group>
         <div class="form-email">
           <label class="form-label">Email Address</label>
           <input type="email" v-model="userEmail" class="form-input" required />
@@ -42,6 +45,7 @@
     <div v-else>
       <input type="file" accept=".json" id="json-input" @change="loadFormData" />
     </div>
+    
   </div>
 </template>
 <script>
@@ -69,6 +73,7 @@ export default {
       dragging: false,
       dragIndex: null,
       targetIndex: null,
+      hovering: null,
     };
   },
   computed: {},
@@ -86,26 +91,51 @@ export default {
       questions[index] = temp;
     },
     startDrag(event, index) {
-      this.dragging = true;
-      this.dragIndex = index;
-    },
-    stopDrag() {
+  this.dragging = true;
+  this.dragIndex = index;
+  event.target.classList.add("dragging");
+},
+dragEnter(index) {
+  this.hovering = index;
+},
+stopDrag(event) {
   this.dragging = false;
   this.dragIndex = null;
+  event.target.classList.remove("dragging");
+},
+dragOver(event, index) {
+  event.preventDefault();
+  if (!this.dragging) {
+    return;
+  }
+  
+  if (index !== this.dragIndex) {
+    this.targetIndex = index;
+    this.hovering = true;
+  }
+  else {
+    this.hovering = false;
+  }
+  const draggedElement = this.$refs.draggedQuestion[0];
+  draggedElement.style.transform = `translateY(${event.offsetY}px)`;
+  draggedElement.addEventListener("transitionend", () => {
+    draggedElement.style.transform = `translateY(0px)`;
+  }, { once: true });
+  
+  // Add event listener for dragleave event
+  event.target.addEventListener("dragleave", () => {
+    this.hovering = null;
+  });
+},
+drop(index) {
+  if (index !== this.dragIndex) {
+    const questions = this.formData.forms[0].questions;
+    const temp = questions[this.dragIndex];
+    questions[this.dragIndex] = questions[index];
+    questions[index] = temp;
+  }
   this.targetIndex = null;
-    },
-    dragOver(event, index) {
-      //event.preventDefault();
-      this.targetIndex = index;
-    },
-    drop(index) {
-      const questions = this.formData.forms[0].questions;
-      const temp = questions[this.dragIndex];
-      questions.splice(this.dragIndex, 1);
-      questions.splice(index, 0, temp);
-      this.dragging = false;
-      this.dragIndex = null;
-      this.targetIndex = null;
+  this.dragging = false;
 },
 
     loadFormData(event) {
@@ -243,7 +273,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
  .up-button,
   .down-button {
     font-size: 0.7rem;
@@ -266,4 +296,44 @@ export default {
     background-color: #2980b9;
     cursor: pointer;
   }
+
+
+
+
+
+.form-question{
+  transition: transform 0.2s ease-in-out;
+}
+
+.form-question.dragging {
+  opacity: 0.5;
+}
+  .question-list {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .question-transition-enter-active, .question-transition-leave-active {
+    transition: all 0.2s ease-out;
+  }
+  .question-transition-enter, .question-transition-leave-to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  .form-question.dragging {
+    opacity: 0.5;
+    transform: rotate(2deg) scale(1.05);
+    transition: transform 0.3s ease-out;
+  }
+  .form-question:hover {
+  background-color: #d9edf7;
+  transition: background-color 0.3s ease-in-out;
+}
+
+  .form-wrapper {
+  width: 80%;
+  margin: 0 auto;
+  /* add other styles as needed */
+}
+
 </style>
