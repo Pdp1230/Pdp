@@ -8,28 +8,29 @@
             class="form-question"
             :class="{ 'dragging': dragging && dragIndex === index, 'over': dragging && targetIndex === index }"
             draggable="true"
+            :data-question-index="index"
             @dragstart="startDrag(event, index)"
-            @dragover.prevent="dragOver(index)"
+            @dragover.prevent="dragOver(event, index)"
             @dragend="stopDrag"
             @drop.prevent="drop(index)"
           >
             <div class="drag-handle">
-            <label class="form-label">{{ question.modelQ }}</label>
-            <br />
-            <component
-              :is="question.component"
-              v-model="question.response.value"
-              :options="question.options"
-              class="form-input"
-            >
-              <template #option="{ option }">{{ option.modelQ }}</template>
-            </component>
-            <div class="question-controls">
-              <q-btn  class="up-button" :disabled="index === 0" icon="arrow_circle_up" @click="moveQuestionUp(index)"/>
-            <q-btn  class="down-button" :disabled="index === formData.forms[0].questions.length - 1"  icon="arrow_circle_down" @click="moveQuestionDown(index)"/>
-    </div>
+              <label class="form-label">{{ question.modelQ }}</label>
+              <br />
+              <component
+                :is="question.component"
+                v-model="question.response.value"
+                :options="question.options"
+                class="form-input"
+              >
+                <template #option="{ option }">{{ option.modelQ }}</template>
+              </component>
+              <div class="question-controls">
+                <q-btn class="up-button" :disabled="index === 0" icon="arrow_circle_up" @click="moveQuestionUp(index)" />
+                <q-btn class="down-button" :disabled="index === formData.forms[0].questions.length - 1" icon="arrow_circle_down" @click="moveQuestionDown(index)" />
+              </div>
+            </div>
           </div>
-        </div>
         </div>
         <div class="form-email">
           <label class="form-label">Email Address</label>
@@ -72,10 +73,6 @@ export default {
   },
   computed: {},
   methods: {
-
-
-
-
     moveQuestionUp(index) {
       const questions = this.formData.forms[0].questions;
       const temp = questions[index - 1];
@@ -88,47 +85,28 @@ export default {
       questions[index + 1] = questions[index];
       questions[index] = temp;
     },
-
     startDrag(event, index) {
-  this.dragging = true;
-  this.dragIndex = index;
-  event.dataTransfer.setData("text/plain", index);
-  // Make a copy of the questions array
-  this.group = [...this.formData.forms[0].questions];
-},
-dragOver(index) {
-  if (index !== this.dragIndex) {
-    // Update the target index
-    this.targetIndex = index;
-    // Swap the positions of the questions in the group array
-    const temp = this.group[index];
-    this.group[index] = this.group[this.dragIndex];
-    this.group[this.dragIndex] = temp;
-    // Update the form style to visually represent the dragging and dropping of the questions
-    this.formStyle = `
-      transform: translateY(${(index - this.dragIndex) * 70}px);
-      transition: transform 150ms;
-    `;
-  }
-},
-    stopDrag() {
-      this.dragging = false;
-      this.dragIndex = null;
-      this.targetIndex = null;
-      this.formStyle = "";
+      this.dragging = true;
+      this.dragIndex = index;
     },
-    drop(index) {
-  // Update the order of the questions in the form data
-  const question = this.group.splice(this.dragIndex, 1)[0];
-  this.group.splice(index, 0, question);
-  this.formData.forms[0].questions = this.group;
-
-  this.group = [];
+    stopDrag() {
   this.dragging = false;
   this.dragIndex = null;
   this.targetIndex = null;
+    },
+    dragOver(event, index) {
+      //event.preventDefault();
+      this.targetIndex = index;
+    },
+    drop(index) {
+      const questions = this.formData.forms[0].questions;
+      const temp = questions[this.dragIndex];
+      questions.splice(this.dragIndex, 1);
+      questions.splice(index, 0, temp);
+      this.dragging = false;
+      this.dragIndex = null;
+      this.targetIndex = null;
 },
-
 
     loadFormData(event) {
       
