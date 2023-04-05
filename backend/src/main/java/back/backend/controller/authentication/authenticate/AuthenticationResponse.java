@@ -1,4 +1,4 @@
-package back.backend.controller;
+package back.backend.controller.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

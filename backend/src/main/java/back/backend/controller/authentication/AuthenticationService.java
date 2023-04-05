@@ -1,4 +1,4 @@
-package back.backend.controller;
+package back.backend.controller.authentication;
 
 import back.backend.config.JwtService;
 import back.backend.entity.Token;
