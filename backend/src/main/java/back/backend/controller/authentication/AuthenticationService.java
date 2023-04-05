@@ -1,6 +1,10 @@
 package back.backend.controller.authentication;
 
 import back.backend.config.JwtService;
+import back.backend.controller.authentication.authenticate.AuthenticationRequest;
+import back.backend.controller.authentication.authenticate.AuthenticationResponse;
+import back.backend.controller.authentication.register.RegisterRequest;
+import back.backend.controller.authentication.register.RegistrationResponse;
 import back.backend.entity.Token;
 import back.backend.entity.TokenType;
 import back.backend.entity.User;

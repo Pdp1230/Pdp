@@ -26,8 +26,8 @@ public class SecurityConfig {
   private final AuthenticationProvider authenticationProvider;
   private final LogoutHandler logoutHandler;
 
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
       http
         .cors( cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable())
@@ -52,7 +52,7 @@ public class SecurityConfig {
 
   // configure CORS policy
   @Bean
-  public CorsConfigurationSource corsConfigurationSource() {
+  CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081")); // add your allowed origins here
     configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
