@@ -424,8 +424,10 @@ export default {
         questions: this.questions.map((question) => ({
           modelQ: question.modelQ,
           type: question.type,
+          index: question.index,
           options: question.options.map((option) => ({
             modelQ: option.modelQ,
+            index: option.index
           })),
         })),
       };
