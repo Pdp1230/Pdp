@@ -296,13 +296,13 @@ export default {
         index: this.cptQuestion,
         modelQ: "",
         type: "radio",
+        cptOptions: 1,
         options: [
           {
             index: 1,
             modelQ: "",
           },
         ],
-        cptOptions: 1,
       });
     },
     deleteQuestion(index) {
@@ -407,6 +407,16 @@ export default {
     submitForm() {
       const uuid = require("uuid");
       const formId = uuid.v4();
+      this.formUrl = window.location.href.split("?")[0] + "?form=" + formId;
+      this.saveForm(
+          {
+            title: this.title,
+            style: this.style,
+            email: this.email,
+            url: this.formUrl,
+            questions: this.questions
+          }
+        );
       const formIndex = this.forms.findIndex((form) => form.id === this.formId);
       const form = {
         id: formId,
@@ -424,7 +434,6 @@ export default {
       } else {
         this.forms.push(form);
       }
-      this.formUrl = window.location.href.split("?")[0] + "?form=" + formId;
       const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
       const formData = {
         title: this.title,
@@ -495,6 +504,30 @@ export default {
           else {
             this.forms = response.data.forms;
           }
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
+      else{
+        this.$router.push({ name: "Login" });
+      }
+    },
+    async saveForm(form){
+      const authToken = sessionStorage.getItem('authToken');
+
+      if (authToken != null) {
+        try {
+          console.log(JSON.stringify(form));
+          const response = await api.post('/form/post',form,{
+              headers: {
+                Authorization : `Bearer ${authToken}`,
+                'Content-Type' : 'application/json'
+              }
+          });
+
+          if (response.status !== 200) {
+            throw new Error('Posting form failed.');
+          } 
         } catch (error) {
           console.log(error.message);
         }

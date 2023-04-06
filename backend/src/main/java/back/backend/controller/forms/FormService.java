@@ -78,7 +78,7 @@ public class FormService {
                         .title(request.getTitle())
                         .style(request.getStyle())
                         .build();
-        formRepository.save(form);
+        formRepository.save(form);       
         for (QuestionRequest q : request.getQuestions()) {
             var question = Question.builder()
                             .form(form)
