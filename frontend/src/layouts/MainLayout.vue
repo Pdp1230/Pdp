@@ -69,6 +69,7 @@
 
 <script>
 import EssentialLink from "components/EssentialLink.vue";
+import api from 'src/api/api';
 
 const linksData = [
   {
@@ -138,28 +139,26 @@ export default {
     async logout() {
       const authToken = sessionStorage.getItem('authToken');
 
-      if(authToken != null){
+      if (authToken != null) {
         try {
-          const response = await fetch('http://localhost:8080/api/auth/logout', {
-            method: 'POST',
+          const response = await api.post('/auth/logout', null, {
             headers: {
               'Authorization': `Bearer ${authToken}`,
               'Content-Type': 'application/json'
             }
           });
 
-          if (!response.ok) {
+          if (response.status !== 200) {
             throw new Error('Logout failed.');
-          }
-          else{
+          } else {
             sessionStorage.removeItem('authToken');
           }
         } catch (error) {
-          console.log(error);
+          console.log(error.message);
         }
       }
       this.$router.push({ name: "Login" });
-    },
+    }
   },
 };
 </script>

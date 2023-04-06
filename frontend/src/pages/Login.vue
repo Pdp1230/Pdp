@@ -133,6 +133,7 @@
 </template>
   
 <script>
+import api from 'src/api/api';
   export default {
     // eslint-disable-next-line
     name: "Login",
@@ -187,27 +188,6 @@
       },
     },
     methods: {
-      async triggerLogin() {
-        const data = {
-          email:this.emailSI,
-          password:this.passwordSI
-        };
-
-        const response = await fetch('http://localhost:8080/api/auth/signin', {
-          method: 'POST',
-          headers:{
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        if(!response.ok)
-          console.log("failed to login");
-        else{
-          const responseData = await response.json();
-          sessionStorage.setItem('authToken', responseData.token);
-          this.$router.push({ name: "Home" });
-        }
-      },
       addUser() {
         this.dialogForm = true;
       },
@@ -217,26 +197,35 @@
           field.value = "";
         });
       },
-      
-      async triggerSignUp() {
-
+      async triggerLogin() {
         const data = {
-          firstname:this.fields[0].value,
-          lastname:this.fields[1].value,
-          email:this.fields[2].value,
-          password:this.fields[3].value
+          email: this.emailSI,
+          password: this.passwordSI
         };
 
-        const response = await fetch('http://localhost:8080/api/auth/signup', {
-          method: 'POST',
-          headers:{
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        })
-        const responseData = await response.text();
-        console.log(responseData);
-        this.closeDialog();
+        try {
+          const response = await api.post('/auth/signin', data);
+          sessionStorage.setItem('authToken', response.data.token);
+          this.$router.push({ name: "Home" });
+        } catch (error) {
+          console.log(error.message);
+        }
+      },
+      async triggerSignUp() {
+        const data = {
+          firstname: this.fields[0].value,
+          lastname: this.fields[1].value,
+          email: this.fields[2].value,
+          password: this.fields[3].value
+        };
+
+        try {
+          const response = await api.post('/auth/signup', data);
+          console.log(response.data);
+          this.closeDialog();
+        } catch (error) {
+          console.log(error.message);
+        }
       },
     },
   };
