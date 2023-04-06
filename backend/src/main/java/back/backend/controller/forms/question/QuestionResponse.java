@@ -16,5 +16,6 @@ public class QuestionResponse {
     private String modelQ;
     private String type;
     private Integer index;
+    private Integer cptOptions;
     private List<OptionResponse> options;
 }

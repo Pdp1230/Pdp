@@ -52,6 +52,7 @@ public class FormService {
                                     .modelQ(question.getModelQ())
                                     .index(question.getQuestionIndex())
                                     .type(question.getType())
+                                    .cptOptions(options.size())
                                     .options(optionsResponse)
                                     .build()
                 );

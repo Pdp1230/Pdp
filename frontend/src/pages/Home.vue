@@ -223,6 +223,8 @@
 
 <script>
 import { v4 as uuidv4 } from "uuid";
+import api from 'src/api/api';
+
 export default {
   name: "formCreator",
   data() {
@@ -240,6 +242,9 @@ export default {
       changeFormStyle: false,
       formUrl: "",
     };
+  },
+  mounted(){
+    this.loadData();
   },
   computed: {
     titleValid() {
@@ -400,65 +405,65 @@ export default {
       this.style = "";
     },
     submitForm() {
-  const uuid = require("uuid");
-  const formId = uuid.v4();
-  const formIndex = this.forms.findIndex((form) => form.id === this.formId);
-  const form = {
-    id: formId,
-    title: this.title,
-    email: this.email,
-    questions: this.questions,
-    style: this.style,
-  };
-  if (formIndex > -1) {
-    if (JSON.stringify(form) === JSON.stringify(this.forms[formIndex])) {
-      alert("No changes were made to the form.");
-      return;
-    }
-    this.forms.splice(formIndex, 1, form);
-  } else {
-    this.forms.push(form);
-  }
-  this.formUrl = window.location.href.split("?")[0] + "?form=" + formId;
-  const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
-  const formData = {
-    title: this.title,
-    id: formId,
-    style: this.style,
-    email: this.email,
-    url: this.formUrl,
-    questions: this.questions.map((question) => ({
-      modelQ: question.modelQ,
-      type: question.type,
-      options: question.options.map((option) => ({
-        modelQ: option.modelQ,
-      })),
-    })),
-  };
-  this.formData = {
-    forms: [formData],
-  };
-  const fileContent = JSON.stringify(this.formData, null, 2);
-  const fileBlob = new Blob([fileContent], { type: "application/json" });
-  const fileLink = document.createElement("a");
-  fileLink.href = URL.createObjectURL(fileBlob);
-  fileLink.download = fileName;
-  fileLink.click();
+      const uuid = require("uuid");
+      const formId = uuid.v4();
+      const formIndex = this.forms.findIndex((form) => form.id === this.formId);
+      const form = {
+        id: formId,
+        title: this.title,
+        email: this.email,
+        questions: this.questions,
+        style: this.style,
+      };
+      if (formIndex > -1) {
+        if (JSON.stringify(form) === JSON.stringify(this.forms[formIndex])) {
+          alert("No changes were made to the form.");
+          return;
+        }
+        this.forms.splice(formIndex, 1, form);
+      } else {
+        this.forms.push(form);
+      }
+      this.formUrl = window.location.href.split("?")[0] + "?form=" + formId;
+      const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
+      const formData = {
+        title: this.title,
+        id: formId,
+        style: this.style,
+        email: this.email,
+        url: this.formUrl,
+        questions: this.questions.map((question) => ({
+          modelQ: question.modelQ,
+          type: question.type,
+          options: question.options.map((option) => ({
+            modelQ: option.modelQ,
+          })),
+        })),
+      };
+      this.formData = {
+        forms: [formData],
+      };
+      const fileContent = JSON.stringify(this.formData, null, 2);
+      const fileBlob = new Blob([fileContent], { type: "application/json" });
+      const fileLink = document.createElement("a");
+      fileLink.href = URL.createObjectURL(fileBlob);
+      fileLink.download = fileName;
+      fileLink.click();
 
-  this.title = "";
-  this.questions = [];
-  this.dialogForm = false;
-  this.formAdd = false;
-  this.cptQuestion = 0;
-  this.isEditForm = false;
+      this.title = "";
+      this.questions = [];
+      this.dialogForm = false;
+      this.formAdd = false;
+      this.cptQuestion = 0;
+      this.isEditForm = false;
 
-  const formDataUrl = URL.createObjectURL(fileBlob);
-  fetch(formDataUrl)
-    .then((response) => response.json())
-    .then((data) => {
-      this.formData = data.forms[0]; // Get the first form in the array of forms
-    });
-},
+      const formDataUrl = URL.createObjectURL(fileBlob);
+      fetch(formDataUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          this.formData = data.forms[0]; // Get the first form in the array of forms
+        });
+    },
     editForm(form) {
       this.dialogForm = true;
       this.formId = form.id;
@@ -472,6 +477,32 @@ export default {
     deleteForm(formId) {
       this.forms = this.forms.filter((form) => form.id !== formId);
     },
+    async loadData() {
+      const authToken = sessionStorage.getItem('authToken');
+
+      if (authToken != null) {
+        try {
+          const response = await api.get('/form/get', {
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          if (response.status !== 200) {
+            throw new Error('Posting form failed.');
+          } 
+          else {
+            this.forms = response.data.forms;
+          }
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
+      else{
+        this.$router.push({ name: "Login" });
+      }
+    }
   },
 };
 </script>
