@@ -9,6 +9,7 @@
             class="form-question"
             :class="{ 'dragging': dragging && dragIndex === index, 'over': hovering === index }"
             draggable="true"
+            ref="draggedQuestion"
             :data-question-index="index"
             @dragstart="startDrag(event, index)"
             @dragover.prevent="dragOver(event, index)"
@@ -48,7 +49,9 @@
     
   </div>
 </template>
-<script>
+
+<script>//Todo classement a faire non classé indicateur classé et aussi a afficher question non classé != question classé
+//todo télécharger le fichier csv contenant les réponses
 import RadioList from "../components/RadioList.vue";
 import CheckboxList from "../components/CheckboxList.vue";
 import { ref } from 'vue';
@@ -90,6 +93,7 @@ export default {
       questions[index + 1] = questions[index];
       questions[index] = temp;
     },
+    
     startDrag(event, index) {
   this.dragging = true;
   this.dragIndex = index;
@@ -108,20 +112,24 @@ dragOver(event, index) {
   if (!this.dragging) {
     return;
   }
-  
+
   if (index !== this.dragIndex) {
     this.targetIndex = index;
     this.hovering = true;
-  }
-  else {
+  } else {
     this.hovering = false;
   }
-  const draggedElement = this.$refs.draggedQuestion[0];
+
+  if (this.targetIndex === null) {
+    this.hovering = false;
+  }
+
+  const draggedElement = this.$refs.draggedQuestion[0].querySelector('.form-question');
   draggedElement.style.transform = `translateY(${event.offsetY}px)`;
   draggedElement.addEventListener("transitionend", () => {
     draggedElement.style.transform = `translateY(0px)`;
   }, { once: true });
-  
+
   // Add event listener for dragleave event
   event.target.addEventListener("dragleave", () => {
     this.hovering = null;
@@ -130,9 +138,11 @@ dragOver(event, index) {
 drop(index) {
   if (index !== this.dragIndex) {
     const questions = this.formData.forms[0].questions;
-    const temp = questions[this.dragIndex];
-    questions[this.dragIndex] = questions[index];
-    questions[index] = temp;
+    const question = questions[this.dragIndex];
+    const response = question.response.value;
+    questions.splice(this.dragIndex, 1);
+    questions.splice(index, 0, question);
+    question.response.value = response;
   }
   this.targetIndex = null;
   this.dragging = false;
@@ -144,8 +154,8 @@ drop(index) {
       const reader = new FileReader();
       reader.readAsText(file);
       reader.onload = () => {
-        const json = reader.result;
-        this.formData = JSON.parse(json);
+        const json = JSON.parse(reader.result);
+        this.formData = json;
         const optionsMap = new Map();
         this.formData.forms.forEach((form) => {
           const styleElem = document.createElement("style");
@@ -257,9 +267,8 @@ drop(index) {
         // Make a POST request to the SendGrid API endpoint with the email data and API key
         const response = await axios.post(SENDGRID_ENDPOINT, msg, {
           headers: {
-            Authorization: `Bearer ${API_KEY}`,
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
+            'Authorization': `Bearer ${API_KEY}`,
+            'Content-Type': 'application/json'
           },
         });
 
