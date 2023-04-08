@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 public class FormRequest {
     private String title;
     private String style;
-    private String email;
     private String url;
+    private Integer index;
+    private Integer cptQuestions;
     private QuestionRequest[] questions;
 }

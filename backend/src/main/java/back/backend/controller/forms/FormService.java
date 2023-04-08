@@ -1,5 +1,6 @@
 package back.backend.controller.forms;
 
+import back.backend.controller.forms.form.FormRequest;
 import back.backend.controller.forms.form.FormResponse;
 import back.backend.controller.forms.option.OptionRequest;
 import back.backend.controller.forms.option.OptionResponse;
@@ -62,6 +63,8 @@ public class FormService {
                             .title(form.getTitle())
                             .style(form.getStyle())
                             .url(form.getUrl())
+                            .index(form.getFormIndex())
+                            .cptQuestions(questions.size())
                             .questions(questionsResponse)
                             .build()
             );
@@ -77,6 +80,7 @@ public class FormService {
                         .url(request.getUrl())
                         .title(request.getTitle())
                         .style(request.getStyle())
+                        .formIndex(request.getIndex())
                         .build();
         formRepository.save(form);       
         for (QuestionRequest q : request.getQuestions()) {

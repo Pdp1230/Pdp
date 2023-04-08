@@ -14,5 +14,6 @@ public class QuestionRequest {
     private String modelQ;
     private String type;
     private Integer index;
+    private Integer cptOptions;
     private OptionRequest[] options;
 }
