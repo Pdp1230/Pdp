@@ -11,15 +11,17 @@
       </p>
     </div>
     <q-list dense>
-      <q-item v-for="form in forms" :key="form.id">
-        <q-item-section>
+      <q-item class="row" v-for="form in forms" :key="form.index">
+        <q-item-section class="col-1">
           <q-item-label>{{ form.title }}</q-item-label>
-          <q-item-label caption>{{ form.email }}</q-item-label>
         </q-item-section>
         <q-item-section side>
-          <q-btn icon="edit" @click="editForm(form)" />
-          <q-btn icon="delete" @click="deleteForm(form.id)" />
-          <q-btn icon="share" @click="shareForm(form.url)" />
+          <div class ="row q-my-md">
+            <q-btn icon="edit" @click="editForm(form)" />
+            <q-btn icon="delete" @click="deleteForm(form.index)" />
+            <q-btn icon="share" @click="shareForm(form.url)" />
+            <q-btn icon="download" @click="downloadFormJson(form)"/>
+          </div>
         </q-item-section>
       </q-item>
     </q-list>
@@ -45,16 +47,8 @@
           <q-input
             placeholder="Titre du formulaire"
             hint="obligatory"
-            v-model="title"
+            v-model="actualForm.title"
             class="col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
-          />
-          <q-input
-            v-model="email"
-            filled
-            type="email"
-            placeholder="Email"
-            hint="obligatory"
-            class="q-ml-md"
           />
           <q-btn
             dense
@@ -66,10 +60,10 @@
             no-caps
           />
         </div>
-        <div v-if="changeFormStyle" class="row q-mt-lg q-mb-md">
+        <div v-if="changeFormStyle" class="row q-mt-lg q-mb-md justify-center">
           <textarea
             id="textcss"
-            v-model="style"
+            v-model="actualForm.style"
             class="q-input col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
             placeholder="      /* Customize your form here */
                                 .q-input {
@@ -88,14 +82,13 @@
               class="q-ml-md"
               @click="addCssTemplate"
             />
-
             <q-btn dense icon="clear" class="q-ml-md" @click="clearStyle" />
           </div>
         </div>
 
         <div
           class="q-mt-xl"
-          v-for="question in questions"
+          v-for="question in actualForm.questions"
           :key="question.index"
         >
           <div class="row justify-center q-mt-md q-ml-md">
@@ -113,13 +106,7 @@
                   <q-select
                     v-model="question.type"
                     hint="Select the question type"
-                    :options="[
-                      'radio',
-                      'text',
-                      'checkbox',
-                      'textarea',
-                      'rating',
-                    ]"
+                    :options="options"
                     class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
                     @update:model-value="
                       updateOptionsArray(question.index, question.type)
@@ -132,12 +119,22 @@
               >
                 <div v-for="option in question.options" :key="option.index">
                   <q-card-section class="q-ml-md justify-start">
-                    <div class="row">
+                    <div class="row q-my-sm">
                       <q-input
                         v-model="option.modelQ"
                         hint="you need to fill in the option"
                         :placeholder="'option number ' + option.index"
                         class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7 rounded-borders"
+                      />
+                      <q-btn
+                        v-if="question.options.length > 1"
+                        class = "q-ml-md"
+                        flat
+                        dense
+                        icon="delete"
+                        label="deleteOption"
+                        @click="deleteOption(question.index, option.index)"
+                        no-caps
                       />
                     </div>
                     <div class="row q-mt-sm">
@@ -154,22 +151,13 @@
                         @click="addOption(question.index)"
                         no-caps
                       />
-                      <q-btn
-                        v-if="question.options.length > 1"
-                        flat
-                        dense
-                        icon="delete"
-                        label="deleteOption"
-                        @click="deleteOption(question.index, option.index)"
-                        no-caps
-                      />
                     </div>
                   </q-card-section>
                 </div>
               </div>
               <div class="row justify-center q-my-lg">
                 <q-btn
-                  v-if="questions.length > 1"
+                  v-if="actualForm.questions.length > 1"
                   flat
                   dense
                   icon="delete"
@@ -183,7 +171,7 @@
           </div>
           <div class="row justify-center q-mt-lg q-ml-md">
             <q-btn
-              v-if="question.index === questions[questions.length - 1].index"
+              v-if="question.index === actualForm.questions[actualForm.questions.length - 1].index"
               flat
               dense
               icon="add"
@@ -195,25 +183,31 @@
         </div>
         <div class="row justify-center q-my-xl">
           <q-btn
+            v-if="isAddForm"
             icon="save"
             label="Submit the form"
             color="green"
             @click="submitForm"
-            :disable="!titleValid || !questionsValid || !emailValid"
+            :disable="!titleValid || !questionsValid"
+          />
+          <q-btn
+            v-if="isEditForm"
+            icon="edit"
+            label="Edit the form"
+            color="green"
+            @click="submitEditForm"
+            :disable="!hasActiveChanges || !titleValid || !questionsValid"
           />
 <!--todo: if question type has options, options should be valid in order to submit-->
 
+          <q-tooltip v-if="isEditForm && !hasActiveChanges">
+            you need to edit the form first
+          </q-tooltip>
           <q-tooltip v-if="!titleValid">
             you need to write a title first
           </q-tooltip>
-          <q-tooltip v-if="!emailValid">
-            you need to fill your email first
-          </q-tooltip>
-          <q-tooltip v-if="titleValid && emailValid && !questionsValid">
+          <q-tooltip v-if="titleValid && !questionsValid">
             you need to finish your questions first
-          </q-tooltip>
-          <q-tooltip v-if="titleValid && !emailValid && !questionsValid">
-            you need to fill your email first
           </q-tooltip>
         </div>
       </q-card>
@@ -222,78 +216,84 @@
 </template>
 
 <script>
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from 'uuid';
 import api from 'src/api/api';
+import _ from "lodash";
 
 export default {
   name: "formCreator",
   data() {
     return {
       forms: [],
-      questions: [],
-      qadd: false,
-      title: "",
-      email: "",
-      style: "",
-      type: "",
-      cptQuestion: 1,
+      actualForm: this.initializeForm(),
+      actualEditForm: {},
       dialogForm: false,
-      formData: {},
+      isAddForm: false,
+      isEditForm: false,
+      cptForms: 0,
       changeFormStyle: false,
-      formUrl: "",
-    };
+      options: [
+                      'radio',
+                      'text',
+                      'checkbox',
+                      'textarea',
+                      'rating',
+                    ]
+    }
   },
   mounted(){
     this.loadData();
   },
   computed: {
     titleValid() {
-      return this.title !== "";
-    },
-    emailValid() {
-      const emailPattern =
-        /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
-      return emailPattern.test(this.email);
+      return this.actualForm.title !== "";
     },
     questionsValid() {
       return (
-        this.questions.length !== 0 &&
-        this.questions.filter((question) => question.modelQ === "").length === 0
+        this.actualForm.questions.length !== 0 &&
+        this.actualForm.questions.filter((question) => question.modelQ === "").length === 0
       );
     },
+    hasActiveChanges() {
+      return !_.isEqual(this.actualForm, this.actualEditForm);
+    }
   },
   methods: {
     addForm() {
+      this.isAddForm = true;
       this.dialogForm = true;
-      this.title = "";
-      this.email = "";
-      this.cptQuestion = 1;
-      this.questions = [
-        {
-          index: 1,
-          modelQ: "",
-          type: "radio",
-          cptOptions: 1,
-          options: [
-            {
-              index: 1,
-              modelQ: "",
-            },
-          ],
-        },
-      ];
-      this.formId = uuidv4();
+    },
+    initializeForm(){
+      return {
+        title : "",
+        style : "",
+        cptQuestions : 1,
+        questions : [
+          {
+            index: 1,
+            modelQ: "",
+            type: "radio",
+            cptOptions: 1,
+            options: [
+              {
+                index: 1,
+                modelQ: "",
+              },
+            ],
+          },
+        ]
+      }
     },
     closeDialog() {
+      this.actualForm = this.initializeForm();
       this.dialogForm = false;
-      this.title = "";
-      this.questions = [];
-      this.cptQuestion = 0;
+      this.isAddForm = false;
+      this.isEditForm = false;
     },
     addQuestion() {
-      this.cptQuestion += 1;
-      this.questions.push({
-        index: this.cptQuestion,
+      this.actualForm.cptQuestions += 1;
+      this.actualForm.questions.push({
+        index: this.actualForm.cptQuestions,
         modelQ: "",
         type: "radio",
         cptOptions: 1,
@@ -307,38 +307,38 @@ export default {
     },
     deleteQuestion(index) {
       let cpt = 1;
-      this.questions = this.questions
+      this.actualForm.questions = this.actualForm.questions
         .filter((question) => question.index !== index)
         .map((question) => ({
           ...question,
           index: cpt++,
         }));
-      this.cptQuestion -= 1;
+      this.actualForm.cptQuestions -= 1;
     },
     updateOptionsArray(questionIndex, questionType) {
       if (questionType !== "radio" && questionType !== "checkbox") {
-        this.questions[questionIndex - 1].options = [];
-        this.questions[questionIndex - 1].cptOptions = 0;
-      } else if (this.questions[questionIndex - 1].options.length === 0) {
-        this.questions[questionIndex - 1].options = [
+        this.actualForm.questions[questionIndex - 1].options = [];
+        this.actualForm.questions[questionIndex - 1].cptOptions = 0;
+      } else if (this.actualForm.questions[questionIndex - 1].options.length === 0) {
+        this.actualForm.questions[questionIndex - 1].options = [
           {
             index: 1,
             modelQ: "",
           },
         ];
-        this.questions[questionIndex - 1].cptOptions = 1;
+        this.actualForm.questions[questionIndex - 1].cptOptions = 1;
       }
     },
     addOption(index) {
-      this.questions[index - 1].cptOptions += 1;
-      this.questions[index - 1].options.push({
-        index: this.questions[index - 1].cptOptions,
+      this.actualForm.questions[index - 1].cptOptions += 1;
+      this.actualForm.questions[index - 1].options.push({
+        index: this.actualForm.questions[index - 1].cptOptions,
         modelQ: "",
       });
     },
     deleteOption(indexQuestion, indexOption) {
       let cpt = 1;
-      this.questions[indexQuestion - 1].options = this.questions[
+      this.actualForm.questions[indexQuestion - 1].options = this.actualForm.questions[
         indexQuestion - 1
       ].options
         .filter((option) => option.index !== indexOption)
@@ -346,7 +346,7 @@ export default {
           ...option,
           index: cpt++,
         }));
-      this.questions[indexQuestion - 1].cptOptions -= 1;
+      this.actualForm.questions[indexQuestion - 1].cptOptions -= 1;
     },
     shareForm(url) {
       if (navigator.share) {
@@ -405,86 +405,60 @@ export default {
       this.style = "";
     },
     submitForm() {
-      const uuid = require("uuid");
-      const formId = uuid.v4();
-      this.formUrl = window.location.href.split("?")[0] + "?form=" + formId;
-      this.saveForm(
-          {
-            title: this.title,
-            style: this.style,
-            email: this.email,
-            url: this.formUrl,
-            questions: this.questions
-          }
-        );
-      const formIndex = this.forms.findIndex((form) => form.id === this.formId);
-      const form = {
-        id: formId,
-        title: this.title,
-        email: this.email,
-        questions: this.questions,
-        style: this.style,
-      };
-      if (formIndex > -1) {
+      this.actualForm.url = window.location.href.split("?")[0] + "?form=" + uuidv4();
+      this.cptForms += 1;
+      this.actualForm.index = this.cptForms;
+      this.saveForm(this.actualForm);
+      /*if (form.index > -1) {
         if (JSON.stringify(form) === JSON.stringify(this.forms[formIndex])) {
           alert("No changes were made to the form.");
           return;
         }
         this.forms.splice(formIndex, 1, form);
-      } else {
-        this.forms.push(form);
-      }
-      const fileName = `${this.title.replace(/ /g, "-").toLowerCase()}.json`;
-      const formData = {
-        title: this.title,
-        id: formId,
-        style: this.style,
-        email: this.email,
-        url: this.formUrl,
-        questions: this.questions.map((question) => ({
-          modelQ: question.modelQ,
-          type: question.type,
-          options: question.options.map((option) => ({
-            modelQ: option.modelQ,
-          })),
-        })),
-      };
-      this.formData = {
-        forms: [formData],
-      };
-      const fileContent = JSON.stringify(this.formData, null, 2);
+      } else {*/
+      this.forms.push(this.actualForm);
+      this.actualForm = this.initializeForm();
+      this.isAddForm = false;
+      this.dialogForm = false;
+      //}
+    },
+    downloadFormJson(form){
+      const fileName = `${form.title.replace(/ /g, "-").toLowerCase()}.json`;
+      const fileContent = JSON.stringify(form, null, 2);
       const fileBlob = new Blob([fileContent], { type: "application/json" });
       const fileLink = document.createElement("a");
       fileLink.href = URL.createObjectURL(fileBlob);
       fileLink.download = fileName;
       fileLink.click();
-
-      this.title = "";
-      this.questions = [];
-      this.dialogForm = false;
-      this.formAdd = false;
-      this.cptQuestion = 0;
-      this.isEditForm = false;
-
-      const formDataUrl = URL.createObjectURL(fileBlob);
+      /*const formDataUrl = URL.createObjectURL(fileBlob);
       fetch(formDataUrl)
         .then((response) => response.json())
         .then((data) => {
           this.formData = data.forms[0]; // Get the first form in the array of forms
-        });
+        });*/
     },
     editForm(form) {
+      this.actualEditForm = _.cloneDeep(form);
+      this.actualForm = _.cloneDeep(form);
+      this.isEditForm = true;
       this.dialogForm = true;
-      this.formId = form.id;
-      this.title = form.title;
-      this.email = form.email;
-      this.style = form.style;
-      this.questions = form.questions;
-      this.options = form.options;
-      //todo: submit only when form is changed, submit doesn't create a new form, modifies the existing form instead
     },
-    deleteForm(formId) {
-      this.forms = this.forms.filter((form) => form.id !== formId);
+    submitEditForm() {
+      //todo api call update form
+      this.forms[this.actualForm.index-1] = _.cloneDeep(this.actualForm);
+      this.actualForm = this.initializeForm();
+      this.actualEditForm = {};
+      this.isEditForm = false;
+      this.dialogForm = false;
+    },
+    deleteForm(index) {
+      let cpt = 1;
+      this.forms = this.forms.filter((form) => form.index !== index)
+                              .map((form) => ({
+                                ...form,
+                                index: cpt++
+                              }));
+      this.cptForms -= 1;
     },
     async loadData() {
       const authToken = sessionStorage.getItem('authToken');
@@ -503,8 +477,10 @@ export default {
           } 
           else {
             this.forms = response.data.forms;
+            this.cptForms = this.forms.length;
           }
         } catch (error) {
+          this.$router.push({ name: "Login" });
           console.log(error.message);
         }
       }
