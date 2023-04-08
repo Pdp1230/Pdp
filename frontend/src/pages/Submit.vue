@@ -50,6 +50,8 @@
   </div>
 </template>
 <script>
+//Todo classement a faire entre les questions les non classé ont toute la meme valeur et indicateur du classement a coté de la question et aussi a afficher indicateur visuel si la question est classé ou non 
+//todo téléchargement d'un fichier csv contenant les réponses au formulaire formaté
 import RadioList from "../components/RadioList.vue";
 import CheckboxList from "../components/CheckboxList.vue";
 import { ref } from 'vue';
@@ -117,12 +119,6 @@ stopDrag(event) {
   this.dragIndex = null;
   this.hovering = null;
 
-  // reset selectedChoice state for RadioList component
-  this.group.forEach(g => {
-    if (g.selectedChoice !== null) {
-      g.selectedChoice = null;
-    }
-  });
 
   event.target.classList.remove("dragging");
 },
@@ -162,14 +158,7 @@ drop(index) {
     const response = question.response.value;
     questions.splice(this.dragIndex, 1);
     questions.splice(index, 0, question);
-    const targetQuestion = questions[index];
-    const targetResponse = targetQuestion.response.value; // Access the value of the response
-    
-    // Preserve the response value when dragging and dropping RadioList and CheckboxList questions
-    if (question.component === 'RadioList' || question.component === 'CheckboxList') {
-      question.response.value = response;
-      targetQuestion.response.value = targetResponse;
-    }
+
   }
 
   this.dragging = false;
