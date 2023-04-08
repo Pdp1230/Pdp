@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FormResponse {
-    private String url;
     private String title;
+    private String url;
     private String style;
+    private Integer index;
+    private Integer cptQuestions;
     private List<QuestionResponse> questions;
 }

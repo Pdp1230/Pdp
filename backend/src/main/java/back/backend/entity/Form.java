@@ -34,6 +34,7 @@ public class Form {
     private String url;
     private String title;
     private String style;
+    private Integer formIndex;
 
     @Column(nullable = false, columnDefinition = "int default 3")
     public int forms_order;
