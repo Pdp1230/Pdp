@@ -6,26 +6,27 @@
         <transition-group name="question-transition" tag="div" class="question-list">
           <div v-for="(question, index) in formData.forms[0]?.questions" :key="index">
             <div
-            class="form-question"
-            :class="{ 'dragging': dragging && dragIndex === index, 'over': hovering === index }"
-            draggable="true"
-            ref="draggedQuestion"
-            :data-question-index="index"
-            @dragstart="startDrag(event, index)"
-            @dragover.prevent="dragOver(event, index)"
-            @dragend="stopDrag"
-            @drop.prevent="drop(index)"
-            @dragenter="dragEnter(index)"
-            >
+                  class="form-question"
+                  :class="{ 'dragging': dragging && dragIndex === index, 'over': hovering === index }"
+                  draggable="true"
+                  ref="draggedQuestion"
+                  :data-question-index="index"
+                  @dragstart="startDrag(event, index)"
+                  @dragover.prevent="dragOver(event, index)"
+                  @dragend="stopDrag"
+                  @drop.prevent="drop(index)"
+                  @dragenter="dragEnter(index)"
+                >
               <div class="drag-handle">
                 <label class="form-label">{{ question.modelQ }}</label>
                 <br />
                 <component
-                  :is="question.component"
-                  v-model="question.response.value"
-                  :options="question.options"
-                  class="form-input"
-                >
+                    :is="question.component"
+                    v-model="question.response.value"
+                    :options="question.options"
+                    :questionIndex="index"
+                    class="form-input"
+                  >
                   <template #option="{ option }">{{ option.modelQ }}</template>
                 </component>
                 <div class="question-controls">
@@ -46,12 +47,9 @@
     <div v-else>
       <input type="file" accept=".json" id="json-input" @change="loadFormData" />
     </div>
-    
   </div>
 </template>
-
-<script>//Todo classement a faire non classé indicateur classé et aussi a afficher question non classé != question classé
-//todo télécharger le fichier csv contenant les réponses
+<script>
 import RadioList from "../components/RadioList.vue";
 import CheckboxList from "../components/CheckboxList.vue";
 import { ref } from 'vue';
@@ -86,25 +84,46 @@ export default {
       const temp = questions[index - 1];
       questions[index - 1] = questions[index];
       questions[index] = temp;
-    },
-    moveQuestionDown(index) {
-      const questions = this.formData.forms[0].questions;
-      const temp = questions[index + 1];
-      questions[index + 1] = questions[index];
-      questions[index] = temp;
-    },
+    },  
+
+moveQuestionDown(index) {
+  const questions = this.formData.forms[0].questions;
+  const temp = questions[index + 1];
+  questions[index + 1] = questions[index];
+  questions[index] = temp;
+},
     
     startDrag(event, index) {
+  const question = this.formData.forms[0].questions[index];
   this.dragging = true;
   this.dragIndex = index;
+  this.draggedQuestion = {
+    ...question,
+    response: { ...question.response }
+  };
+
+  // update selectedChoice state for RadioList component
+  const radioListIndex = question.options.findIndex(o => o === question.response.value);
+  this.group[radioListIndex].selectedChoice = question.response.value;
+
   event.target.classList.add("dragging");
 },
+
 dragEnter(index) {
   this.hovering = index;
 },
 stopDrag(event) {
   this.dragging = false;
   this.dragIndex = null;
+  this.hovering = null;
+
+  // reset selectedChoice state for RadioList component
+  this.group.forEach(g => {
+    if (g.selectedChoice !== null) {
+      g.selectedChoice = null;
+    }
+  });
+
   event.target.classList.remove("dragging");
 },
 dragOver(event, index) {
@@ -129,6 +148,7 @@ dragOver(event, index) {
   draggedElement.addEventListener("transitionend", () => {
     draggedElement.style.transform = `translateY(0px)`;
   }, { once: true });
+  
 
   // Add event listener for dragleave event
   event.target.addEventListener("dragleave", () => {
@@ -142,10 +162,20 @@ drop(index) {
     const response = question.response.value;
     questions.splice(this.dragIndex, 1);
     questions.splice(index, 0, question);
-    question.response.value = response;
+    const targetQuestion = questions[index];
+    const targetResponse = targetQuestion.response.value; // Access the value of the response
+    
+    // Preserve the response value when dragging and dropping RadioList and CheckboxList questions
+    if (question.component === 'RadioList' || question.component === 'CheckboxList') {
+      question.response.value = response;
+      targetQuestion.response.value = targetResponse;
+    }
   }
-  this.targetIndex = null;
+
   this.dragging = false;
+  this.dragIndex = null;
+  this.targetIndex = null;
+  this.hovering = null;
 },
 
     loadFormData(event) {
