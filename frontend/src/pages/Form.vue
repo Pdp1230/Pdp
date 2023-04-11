@@ -2,10 +2,28 @@
   <div v-if="form">
     <h1 class="row justify-center">{{ form.title }}</h1>
     <form @submit.prevent="submitForm">
+      <div class="row justify-center q-ml-md">
+        <q-card class="bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6">
+          <q-card-section class="q-ml-md justify-start">
+            <q-input
+              type="name"
+              placeholder="Fullname"
+              v-model="name"
+            />
+          </q-card-section>
+          <q-card-section class="q-ml-md justify-start">
+            <q-input
+              type="email"
+              placeholder="Email"
+              v-model="email"
+            />
+          </q-card-section>
+        </q-card>
+      </div>
       <div
         v-for="answer in answers"
         :key="answer.index"
-        class="q-my-md q-mx-md"
+        class="q-my-md"
       >
         <div class="row justify-center q-ml-md">
           <q-card
@@ -69,6 +87,8 @@ export default {
     return {
       form: null,
       answers: [],
+      email: "",
+      name: ""
     };
   },
   mounted() {
