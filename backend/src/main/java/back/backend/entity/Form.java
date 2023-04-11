@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "forms", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"url"})
+    @UniqueConstraint(columnNames = {"fetchId"})
 })
 @DependsOn("User")
 public class Form {
@@ -31,7 +31,7 @@ public class Form {
     @Id
     @GeneratedValue
     private long id;
-    private String url;
+    private String fetchId;
     private String title;
     private String style;
     private Integer formIndex;

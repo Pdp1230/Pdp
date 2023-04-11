@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import back.backend.controller.forms.form.FormRequest;
+import back.backend.controller.forms.form.FormResponse;
 
 
 @RestController
@@ -21,6 +23,14 @@ public class FormController {
     @GetMapping("/get")
     public ResponseEntity<FormsResponse> getForms(){
         return ResponseEntity.ok(formService.getForms());
+    }
+
+    @GetMapping("/getform/{fetchId}")
+    public ResponseEntity<FormResponse> getForm(@PathVariable String fetchId){
+        FormResponse response = formService.getFormByFetchId(fetchId);
+        if(response == null)
+            return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/post")

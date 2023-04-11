@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FormResponse {
     private String title;
-    private String url;
+    private String id;
     private String style;
     private Integer index;
     private Integer cptQuestions;

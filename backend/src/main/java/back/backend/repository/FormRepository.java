@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public interface FormRepository extends JpaRepository<Form, Long> {
     Optional<Form> findById(long id);
+    Optional<Form> findByFetchId(String fetchId);
     Boolean existsById(long id);
+    Boolean existsByFetchId(String fetchId);
     List<Form> findAllByUser(User user);
 }

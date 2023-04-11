@@ -62,7 +62,7 @@ public class FormService {
                 FormResponse.builder()
                             .title(form.getTitle())
                             .style(form.getStyle())
-                            .url(form.getUrl())
+                            .id(form.getFetchId())
                             .index(form.getFormIndex())
                             .cptQuestions(questions.size())
                             .questions(questionsResponse)
@@ -74,10 +74,48 @@ public class FormService {
                             .build();
     }
 
+    public FormResponse getFormByFetchId(String fetchId){
+        Form form;
+        if (!formRepository.existsByFetchId(fetchId))
+            return null;
+        form = formRepository.findByFetchId(fetchId).get();
+        List<Question> questions = questionRepository.findAllByForm(form);
+        List<QuestionResponse> questionsResponse = new ArrayList<>();
+        for(Question question : questions){
+            List<Option> options = optionRepository.findAllByQuestion(question);
+            List<OptionResponse> optionsResponse = new ArrayList<>();
+            for(Option option : options){
+                optionsResponse.add(
+                    OptionResponse.builder()
+                                    .modelQ(option.getModelQ())
+                                    .index(option.getOptionIndex())
+                                    .build()
+                );
+            }
+            questionsResponse.add(
+                QuestionResponse.builder()
+                                .modelQ(question.getModelQ())
+                                .index(question.getQuestionIndex())
+                                .type(question.getType())
+                                .cptOptions(options.size())
+                                .options(optionsResponse)
+                                .build()
+            );
+        }
+        return FormResponse.builder()
+                            .title(form.getTitle())
+                            .style(form.getStyle())
+                            .id(form.getFetchId())
+                            .cptQuestions(questions.size())
+                            .questions(questionsResponse)
+                            .build()
+        ;
+    }
+
     public ResponseEntity<?> postForm(FormRequest request){
         var form = Form.builder()
                         .user(user())
-                        .url(request.getUrl())
+                        .fetchId(request.getId())
                         .title(request.getTitle())
                         .style(request.getStyle())
                         .formIndex(request.getIndex())
