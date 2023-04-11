@@ -1,103 +1,139 @@
 <template>
-    <q-page>
-      <q-card>
-        <q-card-section>
-          <h2 class="text-h4">Formulaire</h2>
-        </q-card-section>
-        <q-card-section>
-          <q-form @submit="sendMail" ref="form" id="my-big-form">
-            <q-input v-model="nom" label="Nom :" required />
-            <q-input v-model="email" label="Adresse email :" type="email" required />
-            <q-formgroup>
-            <q-label for="Question1">Genre :</q-label>
-           <div class="radio-container"><radiolist :choices="genderOptions" v-model="selectedGender" /></div>
-            </q-formgroup>
-            <q-select v-model="couleur" label="Couleur préférée :" :options="['Rouge', 'Bleu']" required />
-            <q-card-actions>
-              <q-btn type="submit" label="Envoyer" color="primary" />
-              <q-btn label="Exporter les réponses" color="primary" @click="exportData" />
-              <q-btn label="Importer les réponses" color="primary" @click="importData" />
-            </q-card-actions>
-          </q-form>
-        </q-card-section>
-      </q-card>
-    </q-page>
-  </template>
-  
+  <div v-if="form">
+    <h1 class="row justify-center">{{ form.title }}</h1>
+    <form @submit.prevent="submitForm">
+      <div
+        v-for="answer in answers"
+        :key="answer.index"
+        class="q-my-md q-mx-md"
+      >
+        <div class="row justify-center q-ml-md">
+          <q-card
+            class="bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6"
+          >
+            <q-card-section class="row justify-center">
+              {{ form.questions[answer.index - 1].modelQ }}
+            </q-card-section>
+            <q-card-section class="q-ml-md justify-start">
+              <div class="bg-grey-1">
+                <div v-if="answer.type === 'text'">
+                  <q-input v-model="answer.text" />
+                </div>
+                <div v-if="answer.type === 'textarea'">
+                  <q-input type="textarea" v-model="answer.textarea" />
+                </div>
+                <div v-if="answer.type === 'radio'" class="q-pa-lg">
+                  <q-option-group
+                    v-model="answer.radio"
+                    :options="form.questions[answer.index - 1].options"
+                    color="primary"
+                  />
+                </div>
+                <div v-if="answer.type === 'checkbox'" class="q-pa-lg">
+                  <q-option-group
+                    v-model="answer.selected"
+                    :options="form.questions[answer.index - 1].options"
+                    color="green"
+                    type="checkbox"
+                  />
+                </div>
+                <div v-if="answer.type === 'select'" class="q-gutter-md">
+                  <q-select
+                    filled
+                    v-model="answer.select"
+                    :options="form.questions[answer.index - 1].options"
+                    emit-value
+                    map-options
+                  />
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+      <div class="row justify-center q-my-xl">
+        <button type="submit">Submit</button>
+    </div>
+    </form>
+  </div>
+</template>
 
-  <script>
- import radiolist from "../components/RadioList.vue";
-  
-  export default {
-    
-    components: {
-      radiolist
-    },
-    data() {
-      return {
-        name: '',
-        email: '',
-        department: '',
-        message: '',
-        genderOptions: ["Male", "Female"],
-        selectedGender: null,
-      };
-    },
-    methods: {
-      sendMail() {
-        const answers = {
-          name: this.name,
-          email: this.email,
-          message: this.message,
-        };
-        this.sendAnswers(answers);
-      },
-      exportData() {
-      // Récupération des réponses du formulaire
-      const formData = new FormData(this.$refs.myForm);
-      const data = {};
-      
-      // Boucle sur les entrées du formulaire pour les ajouter à l'objet JSON
-      for (const [key, value] of formData.entries()) {
-        data[key] = value;
+<script>
+import api from "src/api/api";
+import { ref } from "vue";
+
+export default {
+  name: "formResponse",
+  props: ["id"],
+  data() {
+    return {
+      form: null,
+      answers: [],
+    };
+  },
+  mounted() {
+    this.loadForm();
+  },
+  methods: {
+    async loadForm() {
+      try {
+        const response = await api.get(`/form/getform/${this.id}`);
+        this.form = response.data;
+
+        this.form.questions.forEach((question) => {
+          question.options = question.options.map((option) => ({
+            label: option.modelQ,
+            value: option.index,
+          }));
+          switch (question.type) {
+            case "text":
+              this.answers.push({
+                index: question.index,
+                type: question.type,
+                text: "",
+              });
+              break;
+            case "textarea":
+              this.answers.push({
+                index: question.index,
+                type: question.type,
+                textarea: "",
+              });
+              break;
+            case "radio":
+              this.answers.push({
+                index: question.index,
+                type: question.type,
+                radio: 0,
+              });
+              break;
+            case "checkbox":
+              this.answers.push({
+                index: question.index,
+                type: question.type,
+                selected: [],
+              });
+              break;
+            case "select":
+              this.answers.push({
+                index: question.index,
+                type: question.type,
+                select: 1,
+              });
+              break;
+            default:
+              break;
+          }
+        });
+      } catch (error) {
+        console.log(error.message);
+        this.$router.push({ name: "Error404" });
       }
-      
-      // Conversion de l'objet JSON en chaîne de caractères
-      const jsonData = JSON.stringify(data);
-      
-      // Exportation des données en format JSON
-      const a = document.createElement("a");
-      const blob = new Blob([jsonData], { type: "application/json" });
-      a.href = URL.createObjectURL(blob);
-      a.download = "form-data.json";
-      a.click();
-    }
-    ,
-      importData() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = () => {
-          const file = input.files[0];
-          const reader = new FileReader();
-          reader.readAsText(file);
-          reader.onload = (e) => {
-            try {
-              const importedData = JSON.parse(e.target?.result);
-              this.name = importedData.name;
-              this.email = importedData.email;
-              this.department = importedData.department;
-              this.message = importedData.message;
-            } catch (error) {
-              console.error('Error parsing JSON', error);
-            }
-          };
-        };
-        input.click();
-      },
-      sendAnswers(answers) {
-        // Send email implementation
-      },
     },
-  };
-  </script>
+    submitForm() {
+      console.log(this.form);
+      console.log(this.answers);
+    },
+  },
+};
+</script>

@@ -15,9 +15,10 @@ const routes = [
         name: "ResetPassword",
       },
       {
-        path: "form",
+        path: "form/:id",
         component: () => import("pages/Form.vue"),
         name: "Form",
+        props:true
       },
       {
         path: "submit",
@@ -32,6 +33,7 @@ const routes = [
   {
     path: "/*",
     component: () => import("pages/ErrorNotFound.vue"),
+    name : "Error404"
   },
 ];
 

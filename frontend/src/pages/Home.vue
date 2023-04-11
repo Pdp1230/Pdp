@@ -19,7 +19,7 @@
           <div class ="row q-my-md">
             <q-btn icon="edit" @click="editForm(form)" />
             <q-btn icon="delete" @click="deleteForm(form.index)" />
-            <q-btn icon="share" @click="shareForm(form.url)" />
+            <q-btn icon="share" @click="shareForm(form.id)" />
             <q-btn icon="download" @click="downloadFormJson(form)"/>
           </div>
         </q-item-section>
@@ -115,7 +115,7 @@
                 </div>
               </q-card-section>
               <div
-                v-if="question.type === 'radio' || question.type === 'checkbox'"
+                v-if="question.type === 'radio' || question.type === 'checkbox' || question.type === 'select'"
               >
                 <div v-for="option in question.options" :key="option.index">
                   <q-card-section class="q-ml-md justify-start">
@@ -142,7 +142,8 @@
                         v-if="
                           option.index === question.cptOptions &&
                           (question.type === 'radio' ||
-                            question.type === 'checkbox')
+                            question.type === 'checkbox' ||
+                            question.type === 'select')
                         "
                         flat
                         dense
@@ -237,7 +238,7 @@ export default {
                       'text',
                       'checkbox',
                       'textarea',
-                      'rating',
+                      'select',
                     ]
     }
   },
@@ -267,6 +268,7 @@ export default {
       return {
         title : "",
         style : "",
+        id : "",
         cptQuestions : 1,
         questions : [
           {
@@ -316,7 +318,7 @@ export default {
       this.actualForm.cptQuestions -= 1;
     },
     updateOptionsArray(questionIndex, questionType) {
-      if (questionType !== "radio" && questionType !== "checkbox") {
+      if (questionType !== "radio" && questionType !== "checkbox" && questionType !== "select") {
         this.actualForm.questions[questionIndex - 1].options = [];
         this.actualForm.questions[questionIndex - 1].cptOptions = 0;
       } else if (this.actualForm.questions[questionIndex - 1].options.length === 0) {
@@ -348,13 +350,14 @@ export default {
         }));
       this.actualForm.questions[indexQuestion - 1].cptOptions -= 1;
     },
-    shareForm(url) {
+    shareForm(id) {
       if (navigator.share) {
         navigator.share({
-          url: url,
+          url: window.location.href.split("?")[0] + "form/" + id,
         });
       } else {
-        window.prompt("Copy the URL below to share the form:", url);
+        window.prompt("Copy the URL below to share the form:", 
+        window.location.href.split("?")[0] + "form/" + id);
       }
     },
     addCssTemplate() {
@@ -405,22 +408,14 @@ export default {
       this.style = "";
     },
     submitForm() {
-      this.actualForm.url = window.location.href.split("?")[0] + "?form=" + uuidv4();
+      this.actualForm.id = uuidv4();
       this.cptForms += 1;
       this.actualForm.index = this.cptForms;
       this.saveForm(this.actualForm);
-      /*if (form.index > -1) {
-        if (JSON.stringify(form) === JSON.stringify(this.forms[formIndex])) {
-          alert("No changes were made to the form.");
-          return;
-        }
-        this.forms.splice(formIndex, 1, form);
-      } else {*/
       this.forms.push(this.actualForm);
       this.actualForm = this.initializeForm();
       this.isAddForm = false;
       this.dialogForm = false;
-      //}
     },
     downloadFormJson(form){
       const fileName = `${form.title.replace(/ /g, "-").toLowerCase()}.json`;
