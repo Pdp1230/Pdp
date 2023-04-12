@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div v-if="formData" class="form-wrapper" :style="formStyle">
+    <div v-if="formData" class="form-wrapper" :style="formData.forms[0].style">
       <h1 class="form-title">{{ formData.forms[0].title }}</h1>
       <form class="form" @submit.prevent="submitForm">
         <transition-group name="question-transition" tag="div" class="question-list">
-          <div v-for="(question, index) in formData.forms[0]?.questions" :key="index" :class="questionClass(index)">
+          <div v-for="(question, index) in formData.forms[0].questions" :key="index" :class="questionClass(index)">
             <div
               class="form-question"
               :class="{
@@ -20,20 +20,20 @@
               @dragend="stopDrag"
               @drop.prevent="drop(index)"
               @dragenter="dragEnter(index)"
-              >
+            >
 
               <div class="drag-handle">
                 <label class="form-label">{{ question.modelQ }}</label>
                 <br />
                 <component
-                    :is="question.component"
-                    v-model="question.response.value"
-                    :options="question.options"
-                    :questionIndex="index"
-                    class="form-input"
-                  >
-                  <template #option="{ option }">{{ option.modelQ }}</template>
-                </component>
+                :is="question.component"
+                v-model="question.response.value"
+                :options="question.options"
+                :questionIndex="index"
+                class="form-input"
+                >
+</component>
+
                 <div class="question-controls">
                   <q-btn class="up-button" :disabled="index === 0" icon="arrow_circle_up" @click="moveQuestionUp(index)" />
                   <q-btn class="down-button" :disabled="index === formData.forms[0].questions.length - 1" icon="arrow_circle_down" @click="moveQuestionDown(index)" />
@@ -44,7 +44,7 @@
                 <span class="indicator-number">{{ question.rank }}</span>
                 <span class="indicator-text">Classified</span>
               </div>
-              <div class="classification-indicator"   v-if="questionClass(index) == 'unclassified'">
+              <div class="classification-indicator" v-if="questionClass(index) == 'unclassified'">
                 <span class="indicator-number">&nbsp;</span>
                 <span class="indicator-text">Not Classified</span>
               </div>
@@ -112,31 +112,45 @@ export default {
 
 
     updateSortedQuestion(quest) {
-
-
     // Update rank based on position in sorted array
-    this.sortedQuestion.forEach((question, index) => {
-      question.rank = index + 1;
-    });
-
+    quest.rank = this.sortedQuestion.length + 1;
     // Update rank for unclassified questions
-    this.formData.forms[0].questions.quest.rank  = this.sortedQuestion.length + 1;
+    this.sortedQuestion.push(quest);
+    console.log(quest.rank);
   },
+  rankQuestion(questionIndex) {
+  // Get the current question and its rank
+  const question = this.formData.forms[0].questions[questionIndex];
+  const currentRank = question.rank;
 
-    rankQuestion(questionIndex) {
-      const sortedIndex = this.sortedQuestion.findIndex(question => question.questionIndex === questionIndex);
-      const question = this.formData.forms[0].questions[questionIndex];
-      question.rank = sortedIndex + 1;
-    },
-    moveQuestionUp(index) {
+  // Find the index of the current question in the sortedQuestion array
+  const sortedIndex = this.sortedQuestion.findIndex((q) => q.questionIndex === questionIndex);
+
+  // Update the rank of each question in the formData array based on their index in the sortedQuestion array
+  this.formData.forms[0].questions.forEach((q, index) => {
+    if (q.rank !== null && index < sortedIndex) {
+      q.rank += 1;
+    } else if (q.rank !== null && index > sortedIndex && q.rank <= currentRank) {
+      q.rank -= 1;
+    }
+  });
+
+  // Update the rank of the current question
+  question.rank = sortedIndex + 1;
+
+  // Update the sortedQuestion array
+  this.sortedQuestion.splice(sortedIndex, 0, question);
+},
+
+  moveQuestionUp(index) {
     const questions = this.formData.forms[0].questions;
     // Swap questions using destructuring assignment
     [questions[index - 1], questions[index]] = [questions[index], questions[index - 1]];
     // Update rank property for both questions
     questions[index - 1].rank = index;
     questions[index].rank = index + 1;
+    this.rankQuestion(index);
   },
-
   moveQuestionDown(index) {
     const questions = this.formData.forms[0].questions;
     // Swap questions using destructuring assignment
@@ -144,6 +158,7 @@ export default {
     // Update rank property for both questions
     questions[index + 1].rank = index + 2;
     questions[index].rank = index + 1;
+    this.rankQuestion(index);
   },
 
     startDrag(event, index) {
@@ -225,7 +240,7 @@ drop(index) {
 downloadCSV() {
     const questions = this.formData.forms[0].questions;
     const csv = questions.map(question => {
-      return `${question.modelQ},${question.response.value}`;
+      return `${question.type},${question.modelQ},${question.response.value},${question.rank}`;
     }).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -237,88 +252,106 @@ downloadCSV() {
     document.body.removeChild(link);
   },
 
-    loadFormData(event) {
-      
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.readAsText(file);
-      reader.onload = () => {
-        const json = JSON.parse(reader.result);
-        this.formData = json;
-        const optionsMap = new Map();
-        this.formData.forms.forEach((form) => {
-          const styleElem = document.createElement("style");
-          styleElem.id = "form-style";
-          styleElem.innerHTML = form.style.replace(/\n/g, "");
-          document.head.appendChild(styleElem);
-          form.questions.forEach((question) => {
-            question.rank = 0;
-            switch (question.type) {
-              case "select":
-                question.component = "select";
-                question.options = this.questionOptions;
-                break;
-              case "textarea":
-                question.component = "q-textarea";
-                question.options = this.questionOptions;
-                break;
-              case "checkbox":
-                question.component = "CheckboxList";
-                if (!question.response) {
-                  question.response = {
-                    value: null,
-                  };
-                }
-                if (question.options && question.options.length > 0) {
-                  question.options = question.options.map((option) => option.modelQ);
-                }
-                break;
-              case "radio":
-                question.component = "RadioList";
-                if (!question.response) {
-                  question.response = {
-                    value: null,
-                  };
-                }
-                if (question.options && question.options.length > 0) {
-                  question.options = question.options.map((option) => option.modelQ);
-                }
-                break;
-              case "rating":
-                question.component = "q-rating";
-                question.options = this.questionOptions;
-                break;
-              default:
-                throw new Error(`Unknown question type: ${question.type}`);
-            }
-            if (!question.response) {
-              question.response = {
-                value: null,
+
+  
+
+  loadFormData(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.readAsText(file);
+  reader.onload = () => {
+    const json = JSON.parse(reader.result);
+    const optionsMap = new Map();
+    const styleElem = document.createElement("style");
+    styleElem.id = "form-style";
+    styleElem.innerHTML = json.style.replace(/\n/g, "");
+    styleElem.innerHTML = styleElem.innerHTML.replace(/form\{/g, "");
+    styleElem.innerHTML = styleElem.innerHTML.replace(/\}/g, "");
+    document.head.appendChild(styleElem);
+
+    this.formData = {
+    forms: [
+      {
+        title: json.title,
+        style: json.style,
+        questions: json.questions.map(question => {
+          switch (question.type) {
+            case "select":
+              return {
+                component: "q-select",
+                modelQ: question.modelQ,
+                type: question.type,
+                options: question.options.map(option => {
+                  return { modelQ: option.modelQ, value: option.value };
+                }),
+                response: { value: null }
               };
-            }
+            case "textarea":
+              return {
+                component: "textarea",
+                modelQ: question.modelQ,
+                type: question.type,
+                response: { value: null }
+              };
+            case "checkbox":
+            
+              return {
+                component: "CheckboxList",
+                modelQ: question.modelQ,
+                type: question.type,
+                options: question.options.map(option => {
+                  return { modelQ: option.modelQ, checked: false, value: option.value };
+                }),
+                response: { value: [] }
+              };
+            case "radio":
+              return {
+                component: "RadioList",
+                modelQ: question.modelQ,
+                type: question.type,
+                options: question.options.map(option => {
+                  return { modelQ: option.modelQ, checked: false, value: option.value };
+                }),
+                response: { value: null }
+              };
+            case "rating":
+              return {
+                component: "rating",
+                modelQ: question.modelQ,
+                type: question.type,
+                response: { value: null }
+              };
+            default:
+              throw new Error(`Unknown question type: ${question.type}`);
+          }
+        })
+      }
+    ]
+  };
+
+    // create the questionOptions array
+    this.questionOptions = this.formData.forms[0].questions
+      .filter(question => question.options && question.options.length > 0)
+      .map(question => {
+        const modelQ = question.modelQ;
+        const options = question.options.map(option => option.modelQ);
+        optionsMap.set(modelQ, options);
+        return { modelQ, options };
+      });
+
+    // set the options property for each question object
+    this.formData.forms[0].questions.forEach(question => {
+      if (question.options && question.options.length > 0) {
+        const options = optionsMap.get(question.modelQ);
+        if (options) {
+          question.options = options.map(option => {
+            return  option ;
           });
-        });
-        // create the questionOptions array
-        this.questionOptions = Array.from(optionsMap).map(([modelQ, options]) => {
-          return {
-            modelQ,
-            options,
-          };
-        }).map(option => option.modelQ);
-        // set the options property for each question object
-        this.formData.forms.forEach((form) => {
-          form.questions.forEach((question) => {
-            if (question.options && question.options.length > 0) {
-              const options = this.questionOptions.find((qo) => qo.modelQ === question.modelQ);
-              if (options) {
-                question.options = options.options;
-              }
-            }
-          });
-        });
-        this.formStyle = "";
-      };
-    },
+        }
+      }
+    });
+  };
+},
     async submitFormbackend() {
       const formData = this.formData.forms[0];
       const data = formData.questions.reduce((acc, question) => {
