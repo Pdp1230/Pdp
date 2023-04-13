@@ -199,6 +199,7 @@
             @click="submitEditForm"
             :disable="!hasActiveChanges || !titleValid || !questionsValid"
           />
+
 <!--todo: if question type has options, options should be valid in order to submit-->
 
           <q-tooltip v-if="isEditForm && !hasActiveChanges">
@@ -213,6 +214,11 @@
         </div>
       </q-card>
     </q-dialog>
+    
+    <q-btn 
+    @click="loadForm()" 
+    icon="publish"
+    />
   </div>
 </template>
 
@@ -361,6 +367,36 @@ export default {
         window.location.href.split("?")[0] + "form/" + id);
       }
     },
+
+    loadForm() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+  input.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = async (readerEvent) => {
+      const json = readerEvent.target.result;
+      try {
+        const form = JSON.parse(json);
+        const newForm = Object.assign({}, form);
+        this.actualForm = newForm;
+        this.style = newForm.style;
+        this.dialogForm = true;
+        this.isAddForm = true;
+
+        const style = document.createElement("style");
+        style.textContent = newForm.styles;
+        document.head.appendChild(style);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  });
+  input.click();
+},
+
     addCssTemplate() {
       const cssTemplate = `
 
