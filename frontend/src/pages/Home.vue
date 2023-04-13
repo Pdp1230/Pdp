@@ -63,7 +63,7 @@
         <div v-if="changeFormStyle" class="row q-mt-lg q-mb-md justify-center">
           <textarea
             id="textcss"
-            v-model="actualForm.style"
+            v-model="style"
             class="q-input col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
             placeholder="      /* Customize your form here */
                                 .q-input {
@@ -232,6 +232,7 @@ export default {
       isAddForm: false,
       isEditForm: false,
       cptForms: 0,
+      style: "",
       changeFormStyle: false,
       options: [
                       'radio',
@@ -411,6 +412,7 @@ export default {
       this.actualForm.id = uuidv4();
       this.cptForms += 1;
       this.actualForm.index = this.cptForms;
+      this.actualForm.style = this.style;
       this.saveForm(this.actualForm);
       this.forms.push(this.actualForm);
       this.actualForm = this.initializeForm();
@@ -529,7 +531,7 @@ textarea {
   border-width: medium 1px 1px medium;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12) inset;
   color: #555555;
-  font-family: Helveticaf;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 1em;
   line-height: 1.4em;
   padding: 5px 8px;
