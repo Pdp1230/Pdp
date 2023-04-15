@@ -96,35 +96,54 @@
               class="bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6"
             >
               <q-card-section class="q-mt-sm q-ml-md justify-center">
-                <div class="row q-my-sm">
-                  <q-input
-                    v-model="question.modelQ"
-                    hint="you need to fill in the question"
-                    :placeholder="'question number ' + question.index"
-                    class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7"
-                  />
-                  <q-select
-                    v-model="question.type"
-                    hint="Select the question type"
-                    :options="options"
-                    class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
-                    @update:model-value="
-                      updateOptionsArray(question.index, question.type)
-                    "
-                  />
+                <div class="row q-my-sm q-ml-md">
+                    <q-input
+                      v-model="question.modelQ"
+                      hint="you need to fill in the question"
+                      :placeholder="'question number ' + question.index"
+                      class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7"
+                    />
+                    <q-select
+                      v-model="question.type"
+                      hint="Select the question type"
+                      :options="options"
+                      class="col-md-2 col-sm-6 col-xs-6 col-lg-2 col-xl-2 q-ml-md"
+                      @update:model-value="
+                        updateOptionsArray(question.index, question.type)
+                      "
+                    />
                 </div>
+                <q-input
+                  v-if="question.type==='ranking'"
+                  class="q-ma-md"
+                  v-model.number="question.numberOfOptionsToClassify"
+                  hint="Number of options to classify"
+                  mask="#"
+                  fill-mask="0"
+                  reverse-fill-mask
+                  type="number"
+                  filled
+                  lazy-rules
+                  style="max-width: 200px"
+                  :rules="[
+                    (val) =>
+                      (val <= question.options.length && val > 0) ||
+                      'Please type a valid number of options to classify',
+                  ]"
+                />
               </q-card-section>
               <div
-                v-if="question.type === 'radio' || question.type === 'checkbox' || question.type === 'select'"
+                v-if="question.type === 'radio' || question.type === 'checkbox' || question.type === 'select' ||
+                            question.type === 'ranking'"
               >
                 <div v-for="option in question.options" :key="option.index">
-                  <q-card-section class="q-ml-md justify-start">
-                    <div class="row q-my-sm">
+                  <q-card-section class="q-mt-sm q-ml-md justify-start">
+                    <div class="row q-my-sm q-ml-md">
                       <q-input
                         v-model="option.modelQ"
                         hint="you need to fill in the option"
                         :placeholder="'option number ' + option.index"
-                        class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7 rounded-borders"
+                        class="col-md-8 col-sm-11 col-xs-11 col-lg-7 col-xl-7"
                       />
                       <q-btn
                         v-if="question.options.length > 1"
@@ -137,13 +156,14 @@
                         no-caps
                       />
                     </div>
-                    <div class="row q-mt-sm">
+                    <div class="row q-mt-md q-ml-md">
                       <q-btn
                         v-if="
                           option.index === question.cptOptions &&
                           (question.type === 'radio' ||
                             question.type === 'checkbox' ||
-                            question.type === 'select')
+                            question.type === 'select' ||
+                            question.type === 'ranking')
                         "
                         flat
                         dense
@@ -241,6 +261,7 @@ export default {
       style: "",
       changeFormStyle: false,
       options: [
+                      'ranking',
                       'radio',
                       'text',
                       'checkbox',
@@ -289,8 +310,9 @@ export default {
                 modelQ: "",
               },
             ],
+            numberOfOptionsToClassify: 0
           },
-        ]
+        ],
       }
     },
     closeDialog() {
@@ -325,7 +347,7 @@ export default {
       this.actualForm.cptQuestions -= 1;
     },
     updateOptionsArray(questionIndex, questionType) {
-      if (questionType !== "radio" && questionType !== "checkbox" && questionType !== "select") {
+      if (questionType !== "radio" && questionType !== "checkbox" && questionType !== "select" && questionType !== "ranking") {
         this.actualForm.questions[questionIndex - 1].options = [];
         this.actualForm.questions[questionIndex - 1].cptOptions = 0;
       } else if (this.actualForm.questions[questionIndex - 1].options.length === 0) {
@@ -337,6 +359,10 @@ export default {
         ];
         this.actualForm.questions[questionIndex - 1].cptOptions = 1;
       }
+      if(questionType === 'ranking')
+        this.actualForm.questions[questionIndex - 1].numberOfOptionsToClassify = 1;
+      else
+        this.actualForm.questions[questionIndex - 1].numberOfOptionsToClassify = 0;
     },
     addOption(index) {
       this.actualForm.questions[index - 1].cptOptions += 1;
@@ -369,33 +395,33 @@ export default {
     },
 
     loadForm() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = ".json";
-  input.addEventListener("change", async (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.readAsText(file, "UTF-8");
-    reader.onload = async (readerEvent) => {
-      const json = readerEvent.target.result;
-      try {
-        const form = JSON.parse(json);
-        const newForm = Object.assign({}, form);
-        this.actualForm = newForm;
-        this.style = newForm.style;
-        this.dialogForm = true;
-        this.isAddForm = true;
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.addEventListener("change", async (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.readAsText(file, "UTF-8");
+        reader.onload = async (readerEvent) => {
+          const json = readerEvent.target.result;
+          try {
+            const form = JSON.parse(json);
+            const newForm = Object.assign({}, form);
+            this.actualForm = newForm;
+            this.style = newForm.style;
+            this.dialogForm = true;
+            this.isAddForm = true;
 
-        const style = document.createElement("style");
-        style.textContent = newForm.styles;
-        document.head.appendChild(style);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-  });
-  input.click();
-},
+            const style = document.createElement("style");
+            style.textContent = newForm.styles;
+            document.head.appendChild(style);
+          } catch (error) {
+            console.error(error);
+          }
+        };
+      });
+      input.click();
+    },
 
     addCssTemplate() {
       const cssTemplate = `
