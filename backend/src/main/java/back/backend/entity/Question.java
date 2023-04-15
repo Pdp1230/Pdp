@@ -31,6 +31,7 @@ public class Question {
     private String modelQ;
     private String type;
     private Integer questionIndex;
+    private Integer numberOfOptionsToClassify;
 
     @Column(nullable = false, columnDefinition = "int default 4")
     public int questions_order;

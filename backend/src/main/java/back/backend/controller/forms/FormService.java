@@ -55,6 +55,7 @@ public class FormService {
                                     .type(question.getType())
                                     .cptOptions(options.size())
                                     .options(optionsResponse)
+                                    .numberOfOptionsToClassify(question.getNumberOfOptionsToClassify())
                                     .build()
                 );
             }
@@ -99,6 +100,7 @@ public class FormService {
                                 .type(question.getType())
                                 .cptOptions(options.size())
                                 .options(optionsResponse)
+                                .numberOfOptionsToClassify(question.getNumberOfOptionsToClassify())
                                 .build()
             );
         }
@@ -127,6 +129,7 @@ public class FormService {
                             .modelQ(q.getModelQ())
                             .questionIndex(q.getIndex())
                             .type(q.getType())
+                            .numberOfOptionsToClassify(q.getNumberOfOptionsToClassify())
                             .build();
             questionRepository.save(question);
             for(OptionRequest o : q.getOptions()){

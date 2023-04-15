@@ -15,5 +15,6 @@ public class QuestionRequest {
     private String type;
     private Integer index;
     private Integer cptOptions;
+    private Integer numberOfOptionsToClassify;
     private OptionRequest[] options;
 }

@@ -17,5 +17,6 @@ public class QuestionResponse {
     private String type;
     private Integer index;
     private Integer cptOptions;
+    private Integer numberOfOptionsToClassify;
     private List<OptionResponse> options;
 }
