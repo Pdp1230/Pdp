@@ -8,7 +8,7 @@
 - [x] Create new forms architecture, in order to treat users forms data
 - [x] On signup, create a new user table 'forms' to save users forms data in it, this can also be done when new user creates a form for the first time for optimization purposes.
 - [x] Treat requests of type add
-- [ ] (Oussama+Firas) Treat new question type ranking.
+- [x] (Oussama+Firas) Treat new question type ranking.
 - [ ] (Oussama+Firas) Treat answers of all types.
 - [ ] (Oussama) Create new endpoint for getting answers of a form
 - [ ] Treat requests of type edit
