@@ -13,6 +13,7 @@
 - [ ] (Oussama) Create new endpoint for getting answers of a form
 - [ ] Treat requests of type edit
 - [ ] Treat requests of type  remove a form
+- [ ] Fix bug if style isn't empty the form is not handeled
 
 ## FRONT-END
 
@@ -25,7 +26,7 @@
 - [ ] Show messages after sign-in and sign-up attempts.
 - [ ] Add import form from JSON functionnality.
 - [x] (Firas) Add 'ranking' question type to Home.vue.
-- [ ] (Ismail) Add RankingQuestion component, props are: options: Array of {label: string, index: integer} that can be dragged and dropped when displaying, and numberOfElementsToClassify: integer to display a separator
+- [x] (Ismail) Add RankingQuestion component, props are: options: Array of {label: string, index: integer} that can be dragged and dropped when displaying, and numberOfElementsToClassify: integer to display a separator
 - [ ] (Firas) Integrate RankingQuestion in Form.vue
 - [ ] (Ismail) If style exists apply it to Form.vue(style is stocked in this.form.style)
 - [ ] (Firas+Oussama) Show answers of a given form.
