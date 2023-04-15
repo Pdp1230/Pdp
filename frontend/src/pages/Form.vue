@@ -45,6 +45,7 @@
                     v-model="answer.radio"
                     :options="form.questions[answer.index - 1].options"
                     color="primary"
+                    @options-updated="updateOptions(answer.index)"
                   />
                 </div>
                 <div v-if="answer.type === 'checkbox'" class="q-pa-lg">
@@ -53,6 +54,17 @@
                     :options="form.questions[answer.index - 1].options"
                     color="green"
                     type="checkbox"
+                  />
+                </div>
+                <div v-if="answer.type === 'ranking'" class="q-pa-lg">
+                  <span>You have to classify {{form.questions[answer.index - 1].numberOfOptionsToClassify}} options</span>
+                  <DraggableOptionGroup
+                    v-model="answer.selected"
+                    :options="form.questions[answer.index - 1].options"
+                    :numberOfOptionsToClassify="form.questions[answer.index - 1].numberOfOptionsToClassify"
+                    @sorted-options-updated="onSortedOptionsUpdated"
+                    type="ranking"
+
                   />
                 </div>
                 <div v-if="answer.type === 'select'" class="q-gutter-md">
@@ -70,7 +82,7 @@
         </div>
       </div>
       <div class="row justify-center q-my-xl">
-        <button type="submit">Submit</button>
+        <button type="submit" :disabled="!isSortedOptionsValid" >Submit</button>
     </div>
     </form>
   </div>
@@ -78,23 +90,31 @@
 
 <script>
 import api from "src/api/api";
+import DraggableOptionGroup from "../components/DraggableOption.vue"
 import { ref } from "vue";
 
 export default {
   name: "formResponse",
   props: ["id"],
+  components:{
+    DraggableOptionGroup
+  },
   data() {
     return {
       form: null,
       answers: [],
       email: "",
-      name: ""
+      name: "",
+      isSortedOptionsValid:false,
     };
   },
   mounted() {
     this.loadForm();
   },
   methods: {
+    onSortedOptionsUpdated(isValid) {
+      this.isSortedOptionsValid = isValid;
+},
     async loadForm() {
       try {
         const response = await api.get(`/form/getform/${this.id}`);
@@ -117,6 +137,14 @@ export default {
               this.answers.push({
                 index: question.index,
                 type: question.type,
+                textarea: "",
+              });
+              break;
+              case "ranking":
+              this.answers.push({
+                index: question.index,
+                type: question.type,
+                numberOfOptionsToClassify: question.numberOfOptionsToClassify,
                 textarea: "",
               });
               break;
