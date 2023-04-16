@@ -42,14 +42,14 @@
                 </div>
                 <div v-if="answer.type === 'radio'" class="q-pa-lg">
                   <q-option-group
-                    v-model="answer.radio"
+                    v-model="answer.radioChoice"
                     :options="form.questions[answer.index - 1].options"
                     color="primary"
                   />
                 </div>
                 <div v-if="answer.type === 'checkbox'" class="q-pa-lg">
                   <q-option-group
-                    v-model="answer.selected"
+                    v-model="answer.checkboxChoices"
                     :options="form.questions[answer.index - 1].options"
                     color="green"
                     type="checkbox"
@@ -58,7 +58,7 @@
                 <div v-if="answer.type === 'select'" class="q-gutter-md">
                   <q-select
                     filled
-                    v-model="answer.select"
+                    v-model="answer.selectChoice"
                     :options="form.questions[answer.index - 1].options"
                     emit-value
                     map-options
@@ -78,7 +78,6 @@
 
 <script>
 import api from "src/api/api";
-import { ref } from "vue";
 
 export default {
   name: "formResponse",
@@ -124,21 +123,21 @@ export default {
               this.answers.push({
                 index: question.index,
                 type: question.type,
-                radio: 0,
+                radioChoice: 0,
               });
               break;
             case "checkbox":
               this.answers.push({
                 index: question.index,
                 type: question.type,
-                selected: [],
+                checkboxChoices: [],
               });
               break;
             case "select":
               this.answers.push({
                 index: question.index,
                 type: question.type,
-                select: 1,
+                selectChoice: 1,
               });
               break;
             default:
