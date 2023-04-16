@@ -521,7 +521,7 @@ export default {
     },
     async loadData() {
       const authToken = sessionStorage.getItem('authToken');
-
+      
       if (authToken != null) {
         try {
           const response = await api.get('/form/get', {
@@ -568,6 +568,7 @@ export default {
         }
       }
       else{
+        sessionStorage.removeItem('userEmail');
         this.$router.push({ name: "Login" });
       }
     }
