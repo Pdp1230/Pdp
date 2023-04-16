@@ -13,13 +13,9 @@
                 'classified': question.rank === index + 1
               }"
               draggable="true"
-              ref="draggedQuestion"
-              :data-question-index="index"
               @dragstart="startDrag(event, index)"
               @dragover.prevent="dragOver(event, index)"
-              @dragend="stopDrag"
               @drop.prevent="drop(index)"
-              @dragenter="dragEnter(index)"
             >
 
               <div class="drag-handle">
@@ -177,9 +173,6 @@ export default {
   event.target.classList.add("dragging");
 },
 
-dragEnter(index) {
-  this.hovering = index;
-},
 stopDrag(event) {
   this.dragging = false;
   this.dragIndex = null;
@@ -251,7 +244,8 @@ downloadCSV() {
     link.click();
     document.body.removeChild(link);
   },
-
+  //chaque ligne toute les réponses 
+  //une colone un champ (long et wide format)
 
   
 

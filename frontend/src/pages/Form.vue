@@ -1,5 +1,5 @@
 <template>
-  <div v-if="form">
+  <div v-if="form" :style="form.style">
     <h1 class="row justify-center">{{ form.title }}</h1>
     <form @submit.prevent="submitForm">
       <div class="row justify-center q-ml-md">
@@ -40,11 +40,13 @@
                 <div v-if="answer.type === 'textarea'">
                   <q-input type="textarea" v-model="answer.textarea" />
                 </div>
-                <div v-if="answer.type === 'radio'" class="q-pa-lg">
+                <div v-if="answer.type === 'radio'" class="q-pa-lg" >
+                  
                   <q-option-group
                     v-model="answer.radioChoice"
                     :options="form.questions[answer.index - 1].options"
                     color="primary"
+                    @options-updated="updateOptions(answer.index)"
                   />
                 </div>
                 <div v-if="answer.type === 'checkbox'" class="q-pa-lg">
@@ -53,6 +55,17 @@
                     :options="form.questions[answer.index - 1].options"
                     color="green"
                     type="checkbox"
+                  />
+                </div>
+                <div v-if="answer.type === 'ranking'" class="q-pa-lg" >
+                  <span>You have to classify {{form.questions[answer.index - 1].numberOfOptionsToClassify}} options</span>
+                  <DraggableOptionGroup
+                    v-model="answer.selected"
+                    :options="form.questions[answer.index - 1].options"
+                    :numberOfOptionsToClassify="form.questions[answer.index - 1].numberOfOptionsToClassify"
+                    @sorted-options-updated="onSortedOptionsUpdated"
+                    type="ranking"
+
                   />
                 </div>
                 <div v-if="answer.type === 'select'" class="q-gutter-md">
@@ -70,7 +83,8 @@
         </div>
       </div>
       <div class="row justify-center q-my-xl">
-        <button type="submit">Submit</button>
+        <q-btn type="submit" :disabled="!isSortedOptionsValid" label = "Submit"/>
+        <q-btn icon="ios_share" @click="exportToCSV" title='Export to csv' />
     </div>
     </form>
   </div>
@@ -78,27 +92,90 @@
 
 <script>
 import api from "src/api/api";
+import DraggableOptionGroup from "../components/DraggableOption.vue"
+import { ref } from "vue";
 
 export default {
   name: "formResponse",
   props: ["id"],
+  components:{
+    DraggableOptionGroup
+  },
   data() {
     return {
       form: null,
       answers: [],
       email: "",
-      name: ""
+      name: "",
+      formStyle: "",
+      isSortedOptionsValid:true,
     };
   },
   mounted() {
     this.loadForm();
   },
   methods: {
+    onSortedOptionsUpdated(isValid) {
+      this.isSortedOptionsValid = isValid;
+},
+
+async exportToCSV() {
+  const header = ["Email Address", "Full Name"];
+  const rows = [];
+
+  // Add header for each question
+  this.form.questions.forEach((question) => {
+    header.push(`${question.modelQ}:type(${question.type})`);
+  });
+  const start = [this.email, this.name]; // create new row for each answer
+
+  // Add row for each response
+  this.answers.forEach((answer) => {
+    const row = [];
+
+    // Add answer for each question
+    if (answer.type === "ranking") {
+      this.form.questions[answer.index - 1].options.forEach((option) => {
+        const value = option.rank || "null";
+        const label = option.label;
+        row.push(`${label}:${value}`);
+      });
+    } else {
+      const value = answer.selected || answer.select || answer.radio || answer.text || answer.textarea || "";
+      row.push(value);
+    }
+
+    start.push(row.join(","));
+  });
+  rows.push(start)
+
+  // Create CSV file
+  const csv = [header.join(",") + "\n", ...rows].join("");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+  // Download CSV file
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `${this.form.title}.csv`);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+,
     async loadForm() {
       try {
         const response = await api.get(`/form/getform/${this.id}`);
         this.form = response.data;
-
+        console.log(this.form.style);
+        const styleElem = document.createElement("style");
+    styleElem.id = "form-style";
+    styleElem.innerHTML = this.form.style.replace(/\n/g, "");
+    styleElem.innerHTML = styleElem.innerHTML.replace(/form\{/g, "");
+    styleElem.innerHTML = styleElem.innerHTML.replace(/\}/g, "");
+    document.head.appendChild(styleElem);
         this.form.questions.forEach((question) => {
           question.options = question.options.map((option) => ({
             label: option.modelQ,
@@ -116,6 +193,14 @@ export default {
               this.answers.push({
                 index: question.index,
                 type: question.type,
+                textarea: "",
+              });
+              break;
+              case "ranking":
+              this.answers.push({
+                index: question.index,
+                type: question.type,
+                numberOfOptionsToClassify: question.numberOfOptionsToClassify,
                 textarea: "",
               });
               break;
@@ -152,6 +237,7 @@ export default {
     submitForm() {
       console.log(this.form);
       console.log(this.answers);
+      
     },
   },
 };
