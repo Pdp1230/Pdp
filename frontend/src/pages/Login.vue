@@ -206,6 +206,7 @@ import api from 'src/api/api';
         try {
           const response = await api.post('/auth/signin', data);
           sessionStorage.setItem('authToken', response.data.token);
+          sessionStorage.setItem('userEmail',this.emailSI);
           this.$router.push({ name: "Home" });
         } catch (error) {
           console.log(error.message);

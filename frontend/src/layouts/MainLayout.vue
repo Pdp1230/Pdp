@@ -75,12 +75,12 @@ export default {
 
           if (response.status !== 200) {
             throw new Error('Logout failed.');
-          } else {
-            sessionStorage.removeItem('authToken');
           }
         } catch (error) {
             console.log(error.message);
         }
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('userEmail');
       }
       this.$router.push({ name: "Login" });
     }
