@@ -58,7 +58,8 @@
                   />
                 </div>
                 <div v-if="answer.type === 'ranking'" class="q-pa-lg" >
-                  <span>You have to classify {{form.questions[answer.index - 1].numberOfOptionsToClassify}} options</span>
+                  <span v-if="form.questions[answer.index - 1].numberOfOptionsToClassify > 1">You have to classify {{ form.questions[answer.index - 1].numberOfOptionsToClassify }} options</span>
+                  <span v-if="form.questions[answer.index - 1].numberOfOptionsToClassify <= 1">You have to classify {{ form.questions[answer.index - 1].numberOfOptionsToClassify }} option</span>
                   <DraggableOptionGroup
                     v-model="answer.selected"
                     :options="form.questions[answer.index - 1].options"
@@ -83,7 +84,8 @@
         </div>
       </div>
       <div class="row justify-center q-my-xl">
-        <q-btn type="submit" :disabled="!isSortedOptionsValid" label = "Submit"/>
+        <q-btn v-if="currentNumberOfOptionsToClassify() == 0" type="submit" label="Submit" />
+        <q-btn v-if="currentNumberOfOptionsToClassify() != 0" type="submit" :disabled="!isSortedOptionsValid" label="Submit" />
         <q-btn icon="ios_share" @click="exportToCSV" title='Export to csv' />
     </div>
     </form>
@@ -108,7 +110,8 @@ export default {
       email: "",
       name: "",
       formStyle: "",
-      isSortedOptionsValid:true,
+      isSortedOptionsValid:false,
+      numberOfOptionsToClassify: 0,
     };
   },
   mounted() {
@@ -118,6 +121,9 @@ export default {
     onSortedOptionsUpdated(isValid) {
       this.isSortedOptionsValid = isValid;
 },
+currentNumberOfOptionsToClassify() {
+      return this.numberOfOptionsToClassify;
+    },
 
 async exportToCSV() {
   const header = ["Email Address", "Full Name"];
@@ -141,7 +147,7 @@ async exportToCSV() {
         row.push(`${label}:${value}`);
       });
     } else {
-      const value = answer.selected || answer.select || answer.radio || answer.text || answer.textarea || "";
+      const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textarea || "";
       row.push(value);
     }
 
@@ -197,6 +203,7 @@ async exportToCSV() {
               });
               break;
               case "ranking":
+              this.numberOfOptionsToClassify = question.numberOfOptionsToClassify;
               this.answers.push({
                 index: question.index,
                 type: question.type,
