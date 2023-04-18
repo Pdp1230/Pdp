@@ -118,8 +118,11 @@ export default {
     this.loadForm();
   },
   methods: {
+
+    
     onSortedOptionsUpdated(isValid) {
       this.isSortedOptionsValid = isValid;
+
 },
 currentNumberOfOptionsToClassify() {
       return this.numberOfOptionsToClassify;
@@ -175,7 +178,7 @@ async exportToCSV() {
       try {
         const response = await api.get(`/form/getform/${this.id}`);
         this.form = response.data;
-        console.log(this.form.style);
+       
         const styleElem = document.createElement("style");
     styleElem.id = "form-style";
     styleElem.innerHTML = this.form.style.replace(/\n/g, "");
@@ -241,11 +244,54 @@ async exportToCSV() {
         this.$router.push({ name: "Error404" });
       }
     },
-    submitForm() {
-      console.log(this.form);
-      console.log(this.answers);
+    sendEmail() {
       
+
     },
+    submitForm() {
+    const formData = this.form;
+
+
+
+      const response = this.answers.map((answer, index) => {
+      const question = formData.questions[index];
+      if(answer.type=="ranking"){
+        const rankinganswer = []
+        this.form.questions[answer.index - 1].options.forEach((option) => {
+        const value = option.rank || "null";
+        const label = option.label;
+        rankinganswer.push(`${label} rank : ${value} `);
+      });
+      return `${question.modelQ}: ${rankinganswer}`
+      }
+      
+
+      return `${question.modelQ}: ${answer.text || answer.textarea || answer.radioChoice || answer.checkboxChoices || answer.selectChoice || answer.selected }`;
+    }).join(';'+'\n');
+
+    const emailRequestOwner = {
+        toEmail: sessionStorage.getItem('userEmail'),
+        subject: "Réponse au formulaire : "+ formData.title,
+        body: this.name + " à répondue au formulaire ses réponses sont : \n" + response,
+      };
+
+    const emailRequestUser = { toEmail: this.email, subject: 'Form awnser', body: 'Thanks for awnsering our form' };
+   
+    api.post('/email/send', emailRequestUser)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+      api.post('/email/send', emailRequestOwner)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+},
   },
 };
 </script>
