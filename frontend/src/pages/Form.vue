@@ -100,7 +100,7 @@ import { ref } from "vue";
 export default {
   name: "formResponse",
   props: ["id"],
-  components:{
+  components: {
     DraggableOptionGroup
   },
   data() {
@@ -110,8 +110,9 @@ export default {
       email: "",
       name: "",
       formStyle: "",
-      isSortedOptionsValid:false,
+      isSortedOptionsValid: false,
       numberOfOptionsToClassify: 0,
+      rowsCsv: [],
     };
   },
   mounted() {
@@ -119,72 +120,49 @@ export default {
   },
   methods: {
 
-    
+
     onSortedOptionsUpdated(isValid) {
       this.isSortedOptionsValid = isValid;
 
-},
-currentNumberOfOptionsToClassify() {
+    },
+    currentNumberOfOptionsToClassify() {
       return this.numberOfOptionsToClassify;
     },
 
-async exportToCSV() {
-  const header = ["Email Address", "Full Name"];
-  const rows = [];
-
-  // Add header for each question
-  this.form.questions.forEach((question) => {
-    header.push(`${question.modelQ}:type(${question.type})`);
-  });
-  const start = [this.email, this.name]; // create new row for each answer
-
-  // Add row for each response
-  this.answers.forEach((answer) => {
-    const row = [];
-
-    // Add answer for each question
-    if (answer.type === "ranking") {
-      this.form.questions[answer.index - 1].options.forEach((option) => {
-        const value = option.rank || "null";
-        const label = option.label;
-        row.push(`${label}:${value}`);
+    async exportToCSV() {
+      const header = ["Email Address", "Full Name"];
+      // Add header for each question
+      this.form.questions.forEach((question) => {
+        header.push(`${question.modelQ}:type(${question.type})`);
       });
-    } else {
-      const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textarea || "";
-      row.push(value);
+      const start = [this.email, this.name]; // create new row for each answer
+      // Create CSV file
+      const csv = [header.join(",") + "\n", ...this.rowsCsv].join("");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+      // Download CSV file
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `${this.form.title}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     }
-
-    start.push(row.join(","));
-  });
-  rows.push(start)
-
-  // Create CSV file
-  const csv = [header.join(",") + "\n", ...rows].join("");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-
-  // Download CSV file
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", `${this.form.title}.csv`);
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
-}
-,
+    ,
     async loadForm() {
       try {
         const response = await api.get(`/form/getform/${this.id}`);
         this.form = response.data;
-       
+
         const styleElem = document.createElement("style");
-    styleElem.id = "form-style";
-    styleElem.innerHTML = this.form.style.replace(/\n/g, "");
-    styleElem.innerHTML = styleElem.innerHTML.replace(/form\{/g, "");
-    styleElem.innerHTML = styleElem.innerHTML.replace(/\}/g, "");
-    document.head.appendChild(styleElem);
+        styleElem.id = "form-style";
+        styleElem.innerHTML = this.form.style.replace(/\n/g, "");
+        styleElem.innerHTML = styleElem.innerHTML.replace(/form\{/g, "");
+        styleElem.innerHTML = styleElem.innerHTML.replace(/\}/g, "");
+        document.head.appendChild(styleElem);
         this.form.questions.forEach((question) => {
           question.options = question.options.map((option) => ({
             label: option.modelQ,
@@ -205,7 +183,7 @@ async exportToCSV() {
                 textarea: "",
               });
               break;
-              case "ranking":
+            case "ranking":
               this.numberOfOptionsToClassify = question.numberOfOptionsToClassify;
               this.answers.push({
                 index: question.index,
@@ -245,53 +223,96 @@ async exportToCSV() {
       }
     },
     sendEmail() {
-      
-
-    },
-    submitForm() {
-    const formData = this.form;
+      const formData = this.form;
 
 
 
       const response = this.answers.map((answer, index) => {
-      const question = formData.questions[index];
-      if(answer.type=="ranking"){
-        const rankinganswer = []
-        this.form.questions[answer.index - 1].options.forEach((option) => {
-        const value = option.rank || "null";
-        const label = option.label;
-        rankinganswer.push(`${label} rank : ${value} `);
-      });
-      return `${question.modelQ}: ${rankinganswer}`
-      }
-      
+        const question = formData.questions[index];
+        if (answer.type == "ranking") {
+          const rankinganswer = []
+          this.form.questions[answer.index - 1].options.forEach((option) => {
+            const value = option.rank || "null";
+            const label = option.label;
+            rankinganswer.push(`${label} rank : ${value} `);
+          });
+          return `${question.modelQ}: ${rankinganswer}`
+        }
 
-      return `${question.modelQ}: ${answer.text || answer.textarea || answer.radioChoice || answer.checkboxChoices || answer.selectChoice || answer.selected }`;
-    }).join(';'+'\n');
 
-    const emailRequestOwner = {
+        return `${question.modelQ}: ${answer.text ||
+          answer.textarea ||
+          answer.radioChoice ||
+          answer.checkboxChoices || 
+          answer.selectChoice || 
+          answer.selected}`;
+      }).join(';' + '\n');
+
+      const emailRequestOwner = {
         toEmail: sessionStorage.getItem('userEmail'),
-        subject: "Réponse au formulaire : "+ formData.title,
+        subject: "Réponse au formulaire : " + formData.title,
         body: this.name + " à répondue au formulaire ses réponses sont : \n" + response,
       };
 
-    const emailRequestUser = { toEmail: this.email, subject: 'Form awnser', body: 'Thanks for awnsering our form' };
-   
-    api.post('/email/send', emailRequestUser)
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      const emailRequestUser = { toEmail: this.email, subject: 'Form awnser', body: 'Thanks for awnsering our form' };
+
+      api.post('/email/send', emailRequestUser)
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.log(error);
+        });
       api.post('/email/send', emailRequestOwner)
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => {
-        console.log(error);
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+
+    },
+
+    addtocsv() {
+
+
+      const start = [this.email, this.name]; // create new row for each answer
+      // Add row for each response
+      this.answers.forEach((answer) => {
+        const row = [];
+
+        // Add answer for each question
+        if (answer.type === "ranking") {
+          this.form.questions[answer.index - 1].options.forEach((option) => {
+            const value = option.rank || "null";
+            const label = option.label;
+            row.push(`${label}:${value}`);
+          });
+        } else {
+          const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textarea || "";
+          row.push(value);
+        }
+
+        start.push(row.join(","));
       });
-},
+      this.rowsCsv.push(start + "\n")
+
+    },
+
+    clearForm() {
+    this.email = '';
+    this.name = '';
+      
+    },
+    submitForm() {
+      this.sendEmail();
+      this.addtocsv();
+      // Clear the input values
+      this.clearForm();
+
+
+    },
   },
 };
 </script>
