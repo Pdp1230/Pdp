@@ -2,6 +2,7 @@ package back.backend.entity.forms;
 
 import org.springframework.context.annotation.DependsOn;
 
+import back.backend.entity.answers.FormAnswer;
 import back.backend.entity.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,5 +48,9 @@ public class Form {
     @OneToMany(mappedBy = "form")
     @OrderColumn(name = "questionIndex")
     private Question[] questions;
+
+    @OneToMany(mappedBy = "form")
+    @OrderColumn(name = "formAnswerIndex")
+    private FormAnswer[] formAnswers;
 
 }
