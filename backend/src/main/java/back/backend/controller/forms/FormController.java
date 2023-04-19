@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +40,19 @@ public class FormController {
         @RequestBody FormRequest request
     ) {
         return ResponseEntity.ok(formService.postForm(request));
+    }
+
+    @PutMapping("/edit/{fetchId}")
+    public ResponseEntity<?> editForm(
+        @PathVariable String fetchId,
+        @RequestBody FormRequest request
+    ) {
+        ResponseEntity<?> edited = formService.editFormByFetchId(fetchId, request);
+        if (edited != null) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
     @DeleteMapping("/delete/{fetchId}")
     public ResponseEntity<?> deleteForm(@PathVariable String fetchId) {

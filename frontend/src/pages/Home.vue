@@ -503,12 +503,23 @@ export default {
       this.dialogForm = true;
     },
     submitEditForm() {
-      //todo api call update form
+   
       this.forms[this.actualForm.index-1] = _.cloneDeep(this.actualForm);
+      //todo api call update form
+      //console.log(this.actualForm)
+      api.put(`/form/edit/${this.actualForm.id}`,this.actualForm
+
+
+
+    );
       this.actualForm = this.initializeForm();
+         
+         
+      
       this.actualEditForm = {};
       this.isEditForm = false;
       this.dialogForm = false;
+      window.location.reload();
     },
     deleteForm(index,id) {
       let cpt = 1;
