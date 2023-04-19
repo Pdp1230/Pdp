@@ -18,7 +18,7 @@
         <q-item-section side>
           <div class ="row q-my-md">
             <q-btn icon="edit" @click="editForm(form)" />
-            <q-btn icon="delete" @click="deleteForm(form.index)" />
+            <q-btn icon="delete" @click="deleteForm(form.index,form.id)" />
             <q-btn icon="share" @click="shareForm(form.id)" />
             <q-btn icon="download" @click="downloadFormJson(form)"/>
           </div>
@@ -510,7 +510,7 @@ export default {
       this.isEditForm = false;
       this.dialogForm = false;
     },
-    deleteForm(index) {
+    deleteForm(index,id) {
       let cpt = 1;
       this.forms = this.forms.filter((form) => form.index !== index)
                               .map((form) => ({
@@ -518,6 +518,7 @@ export default {
                                 index: cpt++
                               }));
       this.cptForms -= 1;
+      api.delete(`/form/delete/${id}`);
     },
     async loadData() {
       const authToken = sessionStorage.getItem('authToken');
