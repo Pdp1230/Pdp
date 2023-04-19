@@ -505,13 +505,13 @@ export default {
     submitEditForm() {
    
       this.forms[this.actualForm.index-1] = _.cloneDeep(this.actualForm);
-      //todo api call update form
-      //console.log(this.actualForm)
-      api.put(`/form/edit/${this.actualForm.id}`,this.actualForm
-
-
-
-    );
+      const authToken = sessionStorage.getItem('authToken');
+      api.put(`/form/edit/${this.actualForm.id}`,this.actualForm,{
+                  headers: {
+                    Authorization : `Bearer ${authToken}`,
+                    'Content-Type' : 'application/json'
+                  }
+                });
       this.actualForm = this.initializeForm();
          
          
@@ -529,7 +529,12 @@ export default {
                                 index: cpt++
                               }));
       this.cptForms -= 1;
-      api.delete(`/form/delete/${id}`);
+      const authToken = sessionStorage.getItem('authToken');
+      api.delete(`/form/delete/${id}`,{
+                  headers: {
+                    Authorization : `Bearer ${authToken}`,
+                    'Content-Type' : 'application/json'
+                  }});
     },
     async loadData() {
       const authToken = sessionStorage.getItem('authToken');

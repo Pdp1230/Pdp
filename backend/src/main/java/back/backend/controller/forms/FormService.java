@@ -1,15 +1,19 @@
 package back.backend.controller.forms;
 
+import back.backend.controller.answers.AnswerService;
 import back.backend.controller.forms.form.FormRequest;
 import back.backend.controller.forms.form.FormResponse;
 import back.backend.controller.forms.option.OptionRequest;
 import back.backend.controller.forms.option.OptionResponse;
 import back.backend.controller.forms.question.QuestionRequest;
 import back.backend.controller.forms.question.QuestionResponse;
+import back.backend.entity.answers.FormAnswer;
 import back.backend.entity.forms.Form;
 import back.backend.entity.forms.Option;
 import back.backend.entity.forms.Question;
 import back.backend.entity.user.User;
+import back.backend.repository.answers.FormAnswerRepository;
+import back.backend.repository.answers.QuestionAnswerRepository;
 import back.backend.repository.forms.FormRepository;
 import back.backend.repository.forms.OptionRepository;
 import back.backend.repository.forms.QuestionRepository;
@@ -31,6 +35,8 @@ public class FormService {
     private final FormRepository formRepository;
     private final QuestionRepository questionRepository;
     private final OptionRepository optionRepository;
+    private final FormAnswerRepository formAnswerRepository;
+    private final QuestionAnswerRepository questionAnswerRepository;
 
     public FormsResponse getForms(){
         List<Form> forms = formRepository.findAllByUser(user());
@@ -144,63 +150,73 @@ public class FormService {
         }
         return ResponseEntity.ok().build();
     }
+
     @Transactional
-public ResponseEntity<?> editFormByFetchId(String fetchId, FormRequest request) {
-    Form form;
-    if (!formRepository.existsByFetchId(fetchId))
-        return ResponseEntity.notFound().build();
-    form = formRepository.findByFetchId(fetchId).get();
-    form.setTitle(request.getTitle());
-    form.setStyle(request.getStyle());
-    formRepository.save(form);
+    public ResponseEntity<?> editFormByFetchId(String fetchId, FormRequest request) {
+        if ( !formRepository.existsByFetchId(fetchId) )
+            return ResponseEntity.notFound().build();
 
-    // Delete all related questions and their options first
-    List<Question> questions = questionRepository.findAllByForm(form);
-    for(Question question : questions){
-        optionRepository.deleteAllByQuestion(question);
-        questionRepository.delete(question);
-    }
+        Form form = formRepository.findByFetchId(fetchId).get();
+        if( !form.getUser().getEmail().equals( user().getEmail() ) )
+            return ResponseEntity.badRequest().build();
 
-    // Create new questions and options
-    for (QuestionRequest q : request.getQuestions()) {
-        var question = Question.builder()
-                        .form(form)
-                        .modelQ(q.getModelQ())
-                        .questionIndex(q.getIndex())
-                        .type(q.getType())
-                        .numberOfOptionsToClassify(q.getNumberOfOptionsToClassify())
-                        .build();
-        questionRepository.save(question);
-        for(OptionRequest o : q.getOptions()){
-            var option = Option.builder()
-                          .question(question)
-                          .modelQ(o.getModelQ())
-                          .optionIndex(o.getIndex())
-                          .build();
-            optionRepository.save(option);
+        form.setTitle(request.getTitle());
+        form.setStyle(request.getStyle());
+        formRepository.save(form);
+
+        deleteFormDependencies(form);
+
+        // Create new questions and options
+        for (QuestionRequest q : request.getQuestions()) {
+            var question = Question.builder()
+                            .form(form)
+                            .modelQ(q.getModelQ())
+                            .questionIndex(q.getIndex())
+                            .type(q.getType())
+                            .numberOfOptionsToClassify(q.getNumberOfOptionsToClassify())
+                            .build();
+            questionRepository.save(question);
+            for(OptionRequest o : q.getOptions()){
+                var option = Option.builder()
+                            .question(question)
+                            .modelQ(o.getModelQ())
+                            .optionIndex(o.getIndex())
+                            .build();
+                optionRepository.save(option);
+            }
         }
+        return ResponseEntity.ok().build();
     }
-
-    return ResponseEntity.ok().build();
-}
     
     @Transactional
     public ResponseEntity<?> deleteFormByFetchId(String fetchId) {
-        Form form;
-        if (!formRepository.existsByFetchId(fetchId))
+        if ( !formRepository.existsByFetchId(fetchId) )
             return ResponseEntity.notFound().build();
-        form = formRepository.findByFetchId(fetchId).get();
-        // Delete all related questions and their options first
+
+        Form form = formRepository.findByFetchId(fetchId).get();
+        if( !form.getUser().getEmail().equals( user().getEmail() ) )
+            return ResponseEntity.badRequest().build();
+
+        deleteFormDependencies(form);
+
+        formRepository.delete(form);
+        return ResponseEntity.ok().build();
+    }
+    
+
+    private void deleteFormDependencies(Form form){
+        List<FormAnswer> formAnswers = formAnswerRepository.findAllByForm(form);
+        for(var formAnswer : formAnswers){
+            questionAnswerRepository.deleteAllByFormAnswer(formAnswer);
+            formAnswerRepository.delete(formAnswer);
+        }
+
         List<Question> questions = questionRepository.findAllByForm(form);
         for(Question question : questions){
             optionRepository.deleteAllByQuestion(question);
             questionRepository.delete(question);
         }
-        // Then delete the form
-        formRepository.delete(form);
-        return ResponseEntity.ok().build();
     }
-    
 
     private User user(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
