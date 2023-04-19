@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,10 +29,8 @@ public class Option {
     @GeneratedValue
     private long id;
     private String modelQ;
+    @OrderColumn(name = "optionIndex", nullable = false, columnDefinition = "int default 1")
     private Integer optionIndex;
-
-    @Column(nullable = false, columnDefinition = "int default 5")
-    public int options_order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")

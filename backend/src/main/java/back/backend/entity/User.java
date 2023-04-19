@@ -33,9 +33,11 @@ public class User implements UserDetails{
     public int users_order;
 
     @OneToMany(mappedBy = "user")
+    @OrderColumn(name = "tokens_order")
     private Token[] tokens;
 
     @OneToMany(mappedBy = "user")
+    @OrderColumn(name = "formIndex")
     private Form[] forms;
 
     public long getId(){

@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,16 +31,15 @@ public class Question {
     private long id;
     private String modelQ;
     private String type;
+    @Column(name = "questionIndex", nullable = false, columnDefinition = "int default 1")
     private Integer questionIndex;
     private Integer numberOfOptionsToClassify;
-
-    @Column(nullable = false, columnDefinition = "int default 4")
-    public int questions_order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "form_id")
     private Form form;
 
     @OneToMany(mappedBy = "question")
+    @OrderColumn(name = "optionIndex")
     private Option[] options;
 }

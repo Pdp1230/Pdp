@@ -39,7 +39,7 @@ public class Token {
 
   public boolean expired;
 
-  @Column(nullable = false, columnDefinition = "int default 2")
+  @Column(nullable = false, columnDefinition = "int default 0")
   public int tokens_order;
 
   @ManyToOne
