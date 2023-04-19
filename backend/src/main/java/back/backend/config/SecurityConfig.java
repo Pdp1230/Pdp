@@ -36,6 +36,8 @@ public class SecurityConfig {
         .permitAll()
         .requestMatchers("/api/form/getform/**")
         .permitAll()
+        .requestMatchers("/api/answer/submit/**")
+        .permitAll()
         .requestMatchers("/api/form/delete/**")
         .permitAll()
         .requestMatchers("/api/email/send")

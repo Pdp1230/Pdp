@@ -39,7 +39,7 @@
                   <q-input v-model="answer.text" />
                 </div>
                 <div v-if="answer.type === 'textarea'">
-                  <q-input type="textarea" v-model="answer.textarea" />
+                  <q-input type="textarea" v-model="answer.textArea" />
                 </div>
                 <div v-if="answer.type === 'radio'" class="q-pa-lg" >
                   
@@ -182,7 +182,7 @@ export default {
               this.answers.push({
                 index: question.index,
                 type: question.type,
-                textarea: "",
+                textArea: "",
               });
               break;
             case "ranking":
@@ -243,7 +243,7 @@ export default {
 
 
         return `${question.modelQ}: ${answer.text ||
-          answer.textarea ||
+          answer.textArea ||
           answer.radioChoice ||
           answer.checkboxChoices || 
           answer.selectChoice || 
@@ -292,7 +292,7 @@ export default {
             row.push(`${label}:${value}`);
           });
         } else {
-          const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textarea || "";
+          const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textArea || "";
           row.push(value);
         }
 
