@@ -144,7 +144,12 @@ CREATE DATABASE users;
 ```
 Note: Replace [password] with your actual MySQL password when using the command. 
 
-
+Now to set up your email sender adress you may go to resources/application.properies file and replace :
+```
+spring.mail.username=mymail@gmail.com
+spring.mail.password=mygeneratedpassapp
+```
+Note : you must have two step authentification set up in your gmail adress and generate an pass for application you can follow this guide : https://support.google.com/mail/answer/185833?hl=en
 ### Build the project:
 ```bash
 mvn clean install

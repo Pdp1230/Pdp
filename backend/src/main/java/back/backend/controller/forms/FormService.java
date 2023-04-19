@@ -13,6 +13,7 @@ import back.backend.entity.user.User;
 import back.backend.repository.forms.FormRepository;
 import back.backend.repository.forms.OptionRepository;
 import back.backend.repository.forms.QuestionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -143,6 +144,23 @@ public class FormService {
         }
         return ResponseEntity.ok().build();
     }
+    @Transactional
+    public ResponseEntity<?> deleteFormByFetchId(String fetchId) {
+        Form form;
+        if (!formRepository.existsByFetchId(fetchId))
+            return ResponseEntity.notFound().build();
+        form = formRepository.findByFetchId(fetchId).get();
+        // Delete all related questions and their options first
+        List<Question> questions = questionRepository.findAllByForm(form);
+        for(Question question : questions){
+            optionRepository.deleteAllByQuestion(question);
+            questionRepository.delete(question);
+        }
+        // Then delete the form
+        formRepository.delete(form);
+        return ResponseEntity.ok().build();
+    }
+    
 
     private User user(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

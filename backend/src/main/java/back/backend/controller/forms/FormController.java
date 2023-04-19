@@ -3,6 +3,7 @@ package back.backend.controller.forms;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,5 +40,14 @@ public class FormController {
     ) {
         return ResponseEntity.ok(formService.postForm(request));
     }
+    @DeleteMapping("/delete/{fetchId}")
+    public ResponseEntity<?> deleteForm(@PathVariable String fetchId) {
+    ResponseEntity<?> deleted = formService.deleteFormByFetchId(fetchId);
+    if (deleted != null) {
+        return ResponseEntity.ok().build();
+    } else {
+        return ResponseEntity.notFound().build();
+    }
+}
     
 }
