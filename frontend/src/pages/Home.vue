@@ -519,6 +519,7 @@ export default {
       this.actualEditForm = {};
       this.isEditForm = false;
       this.dialogForm = false;
+      window.location.reload();
     },
     deleteForm(index,id) {
       let cpt = 1;
