@@ -145,6 +145,46 @@ public class FormService {
         return ResponseEntity.ok().build();
     }
     @Transactional
+public ResponseEntity<?> editFormByFetchId(String fetchId, FormRequest request) {
+    Form form;
+    if (!formRepository.existsByFetchId(fetchId))
+        return ResponseEntity.notFound().build();
+    form = formRepository.findByFetchId(fetchId).get();
+    form.setTitle(request.getTitle());
+    form.setStyle(request.getStyle());
+    formRepository.save(form);
+
+    // Delete all related questions and their options first
+    List<Question> questions = questionRepository.findAllByForm(form);
+    for(Question question : questions){
+        optionRepository.deleteAllByQuestion(question);
+        questionRepository.delete(question);
+    }
+
+    // Create new questions and options
+    for (QuestionRequest q : request.getQuestions()) {
+        var question = Question.builder()
+                        .form(form)
+                        .modelQ(q.getModelQ())
+                        .questionIndex(q.getIndex())
+                        .type(q.getType())
+                        .numberOfOptionsToClassify(q.getNumberOfOptionsToClassify())
+                        .build();
+        questionRepository.save(question);
+        for(OptionRequest o : q.getOptions()){
+            var option = Option.builder()
+                          .question(question)
+                          .modelQ(o.getModelQ())
+                          .optionIndex(o.getIndex())
+                          .build();
+            optionRepository.save(option);
+        }
+    }
+
+    return ResponseEntity.ok().build();
+}
+    
+    @Transactional
     public ResponseEntity<?> deleteFormByFetchId(String fetchId) {
         Form form;
         if (!formRepository.existsByFetchId(fetchId))

@@ -38,6 +38,8 @@ public class SecurityConfig {
         .permitAll()
         .requestMatchers("/api/form/delete/**")
         .permitAll()
+        .requestMatchers("/api/form/edit/*")
+        .permitAll()
         .requestMatchers("/api/email/send")
         .permitAll()
         .anyRequest()
