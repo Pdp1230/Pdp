@@ -307,13 +307,28 @@ export default {
     this.name = '';
       
     },
+    async postAnswers(){
+      const data = {
+        email: this.email,
+        name: this.name,
+        answers: this.answers
+      }
+      try{
+        const response = await api.post(`/answer/submit/${this.id}`,data);
+
+        if (response.status !== 200) {
+          throw new Error('Posting answers failed.');
+        } 
+      } catch (error) {
+        console.log(error.message);
+      }
+    },
     submitForm() {
       this.sendEmail();
       this.addtocsv();
+      this.postAnswers();
       // Clear the input values
       this.clearForm();
-
-
     },
   },
 };
