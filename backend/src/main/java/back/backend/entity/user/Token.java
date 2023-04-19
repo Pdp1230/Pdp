@@ -1,4 +1,4 @@
-package back.backend.entity;
+package back.backend.entity.user;
 
 import org.springframework.context.annotation.DependsOn;
 

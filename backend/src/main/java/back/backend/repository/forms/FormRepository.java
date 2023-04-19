@@ -1,7 +1,8 @@
-package back.backend.repository;
+package back.backend.repository.forms;
 
-import back.backend.entity.Form;
-import back.backend.entity.User;
+import back.backend.entity.forms.Form;
+import back.backend.entity.user.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

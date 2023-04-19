@@ -1,4 +1,4 @@
-package back.backend.entity;
+package back.backend.entity.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import back.backend.entity.forms.Form;
 import jakarta.persistence.*;
 
 @Data

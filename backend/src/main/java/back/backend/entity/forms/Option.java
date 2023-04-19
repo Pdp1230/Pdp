@@ -1,4 +1,4 @@
-package back.backend.entity;
+package back.backend.entity.forms;
 
 import org.springframework.context.annotation.DependsOn;
 
@@ -10,8 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,24 +20,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "questions")
-@DependsOn("Form")
-public class Question {
+@Table(name = "options")
+@DependsOn("Question")
+public class Option {
 
     @Id
     @GeneratedValue
     private long id;
     private String modelQ;
-    private String type;
-    @Column(name = "questionIndex", nullable = false, columnDefinition = "int default 1")
-    private Integer questionIndex;
-    private Integer numberOfOptionsToClassify;
+    @Column(name = "optionIndex", nullable = false, columnDefinition = "int default 1")
+    private Integer optionIndex;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "form_id")
-    private Form form;
-
-    @OneToMany(mappedBy = "question")
-    @OrderColumn(name = "optionIndex")
-    private Option[] options;
+    @JoinColumn(name = "question_id")
+    private Question question;
 }

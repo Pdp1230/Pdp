@@ -2,7 +2,7 @@ package back.backend.controller.authentication.register;
 
 import java.util.List;
 
-import back.backend.entity.Question;
+import back.backend.entity.forms.Question;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

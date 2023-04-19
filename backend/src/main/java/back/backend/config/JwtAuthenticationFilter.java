@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import back.backend.repository.TokenRepository;
+import back.backend.repository.user.TokenRepository;
 
 @Component
 @RequiredArgsConstructor

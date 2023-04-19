@@ -1,7 +1,7 @@
-package back.backend.repository;
+package back.backend.repository.forms;
 
-import back.backend.entity.Option;
-import back.backend.entity.Question;
+import back.backend.entity.forms.Option;
+import back.backend.entity.forms.Question;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

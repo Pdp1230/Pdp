@@ -1,4 +1,4 @@
-package back.backend.entity;
+package back.backend.entity.user;
 
 public enum TokenType {
   BEARER

@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
-import back.backend.repository.TokenRepository;
+import back.backend.repository.user.TokenRepository;
 
 @Service
 @RequiredArgsConstructor

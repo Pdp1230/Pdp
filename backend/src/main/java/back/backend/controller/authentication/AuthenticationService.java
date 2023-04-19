@@ -5,11 +5,11 @@ import back.backend.controller.authentication.authenticate.AuthenticationRequest
 import back.backend.controller.authentication.authenticate.AuthenticationResponse;
 import back.backend.controller.authentication.register.RegisterRequest;
 import back.backend.controller.authentication.register.RegistrationResponse;
-import back.backend.entity.Token;
-import back.backend.entity.TokenType;
-import back.backend.entity.User;
-import back.backend.repository.TokenRepository;
-import back.backend.repository.UserRepository;
+import back.backend.entity.user.Token;
+import back.backend.entity.user.TokenType;
+import back.backend.entity.user.User;
+import back.backend.repository.user.TokenRepository;
+import back.backend.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

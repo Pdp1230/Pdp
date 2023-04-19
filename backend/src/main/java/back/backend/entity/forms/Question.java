@@ -1,13 +1,12 @@
-package back.backend.entity;
+package back.backend.entity.forms;
 
 import org.springframework.context.annotation.DependsOn;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,28 +22,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "forms", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"fetchId"})
-})
-@DependsOn("User")
-public class Form {
+@Table(name = "questions")
+@DependsOn("Form")
+public class Question {
 
     @Id
     @GeneratedValue
     private long id;
-    private String fetchId;
-    private String title;
-    @Column(length = 2040)
-    private String style;
-    @Column(name = "formIndex", nullable = false, columnDefinition = "int default 1")
-    private Integer formIndex;
+    private String modelQ;
+    private String type;
+    @Column(name = "questionIndex", nullable = false, columnDefinition = "int default 1")
+    private Integer questionIndex;
+    private Integer numberOfOptionsToClassify;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "form_id")
+    private Form form;
 
-    @OneToMany(mappedBy = "form")
-    @OrderColumn(name = "questionIndex")
-    private Question[] questions;
-
+    @OneToMany(mappedBy = "question")
+    @OrderColumn(name = "optionIndex")
+    private Option[] options;
 }
