@@ -1,7 +1,8 @@
 <template>
+  <form @submit.prevent="submitForm">
   <div v-if="form" :style="form.style">
     <h1 class="row justify-center">{{ form.title }}</h1>
-    <form @submit.prevent="submitForm">
+    
       <div class="row justify-center q-ml-md">
         <q-card class="bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6">
           <q-card-section class="q-ml-md justify-start">
@@ -88,8 +89,9 @@
         <q-btn v-if="currentNumberOfOptionsToClassify() != 0" type="submit" :disabled="!isSortedOptionsValid" label="Submit" />
         <q-btn icon="ios_share" @click="exportToCSV" title='Export to csv' />
     </div>
+    </div>
     </form>
-  </div>
+  
 </template>
 
 <script>
