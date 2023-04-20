@@ -38,8 +38,8 @@
         default: null,
       },
       draggable: {
-        type: String,
-        default: "true",
+        type: Boolean,
+        default: true,
       },
       numberOfOptionsToClassify: {
         type: Number,

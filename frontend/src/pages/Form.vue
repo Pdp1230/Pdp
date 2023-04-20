@@ -10,6 +10,7 @@
               type="name"
               placeholder="Fullname"
               v-model="name"
+              :disable="disabled"
             />
           </q-card-section>
           <q-card-section class="q-ml-md justify-start">
@@ -17,6 +18,7 @@
               type="email"
               placeholder="Email"
               v-model="email"
+              :disable="disabled"
             />
           </q-card-section>
         </q-card>
@@ -36,18 +38,18 @@
             <q-card-section class="q-ml-md justify-start">
               <div class="bg-grey-1">
                 <div v-if="answer.type === 'text'">
-                  <q-input v-model="answer.text" />
+                  <q-input v-model="answer.text" :disable="disabled" />
                 </div>
                 <div v-if="answer.type === 'textarea'">
-                  <q-input type="textarea" v-model="answer.textArea" />
+                  <q-input type="textarea" v-model="answer.textArea" :disable="disabled"/>
                 </div>
                 <div v-if="answer.type === 'radio'" class="q-pa-lg" >
-                  
                   <q-option-group
                     v-model="answer.radioChoice"
                     :options="form.questions[answer.index - 1].options"
                     color="primary"
                     @options-updated="updateOptions(answer.index)"
+                    :disable="disabled"
                   />
                 </div>
                 <div v-if="answer.type === 'checkbox'" class="q-pa-lg">
@@ -56,6 +58,7 @@
                     :options="form.questions[answer.index - 1].options"
                     color="green"
                     type="checkbox"
+                    :disable="disabled"
                   />
                 </div>
                 <div v-if="answer.type === 'ranking'" class="q-pa-lg" >
@@ -67,7 +70,7 @@
                     :numberOfOptionsToClassify="form.questions[answer.index - 1].numberOfOptionsToClassify"
                     @sorted-options-updated="onSortedOptionsUpdated"
                     type="ranking"
-
+                    :draggable="!disabled"
                   />
                 </div>
                 <div v-if="answer.type === 'select'" class="q-gutter-md">
@@ -77,6 +80,7 @@
                     :options="form.questions[answer.index - 1].options"
                     emit-value
                     map-options
+                    :disable="disabled"
                   />
                 </div>
               </div>
@@ -85,9 +89,9 @@
         </div>
       </div>
       <div class="row justify-center q-my-xl">
-        <q-btn v-if="currentNumberOfOptionsToClassify() == 0" type="submit" label="Submit" />
-        <q-btn v-if="currentNumberOfOptionsToClassify() != 0" type="submit" :disabled="!isSortedOptionsValid" label="Submit" />
-        <q-btn icon="ios_share" @click="exportToCSV" title='Export to csv' />
+        <q-btn v-if="!disabled && currentNumberOfOptionsToClassify() == 0" type="submit" label="Submit"  />
+        <q-btn v-if="!disabled && currentNumberOfOptionsToClassify() != 0" type="submit" :disabled="!isSortedOptionsValid" label="Submit" />
+        <q-btn v-if="disabled" icon="ios_share" @click="exportToCSV" title='Export to csv' />
     </div>
     </div>
     </form>
@@ -97,17 +101,46 @@
 <script>
 import api from "src/api/api";
 import DraggableOptionGroup from "../components/DraggableOption.vue"
-import { ref } from "vue";
+import _ from "lodash";
 
 export default {
-  name: "formResponse",
-  props: ["id"],
+  name: "FormResponse",
+  props: {
+    id: {
+      type: String,
+      required: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    formProp: {
+      type: Object,
+      default: null
+    },
+    answersProp: {
+      type: Array,
+      required: false
+    },
+    emailProp: {
+      type: String,
+      default: ""
+    },
+    nameProp: {
+      type: String,
+      default: ""
+    }
+  },
   components: {
     DraggableOptionGroup
   },
   data() {
     return {
-      form: null,
+      form: {
+      title: "",
+      questions: [],
+      style: "",
+    },
       answers: [],
       email: "",
       name: "",
@@ -118,7 +151,20 @@ export default {
     };
   },
   mounted() {
-    this.loadForm();
+    if(this.disabled){
+      this.form = _.cloneDeep(this.formProp);
+      this.form.questions.forEach((question) => {
+        question.options = question.options.map((option) => ({
+          label: option.modelQ,
+          value: option.index,
+        }));
+      });
+      this.answers = _.cloneDeep(this.answersProp);
+      this.email = this.emailProp;
+      this.name = this.nameProp;
+    }
+    else
+      this.loadForm();
   },
   methods: {
 
