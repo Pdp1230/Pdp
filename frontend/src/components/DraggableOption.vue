@@ -13,6 +13,9 @@
         @dragstart="onDragStart(index, $event)"
         @dragover="onDragOver(index, $event)"
         @drop="onDrop(index, $event)"
+        @touchstart="onTouchStart(index, $event)"
+        @touchmove="onTouchMove(index, $event)"
+        @touchend="onTouchEnd(index, $event)"
       >
         <div class="drag-handle">
           {{ option.label }}
@@ -21,7 +24,7 @@
           <span class="indicator-number">{{ option.rank }}</span>
         </div>
       </div>
-      <q-btn icon="restart_alt" @click="resetOptions"/>
+      <q-btn icon="restart_alt" ref="childButton" @click="resetOptions"/>
     </div>
   </template>
   
@@ -59,6 +62,7 @@
         isSortedOptionsValid () {
         return this.sortedOptions.length === this.numberOfOptionsToClassify;
       },
+      
     },
     methods: {
 
@@ -69,7 +73,9 @@
       });
       this.sortedOptions = [];
       this.$emit("sorted-options-updated", false);
+      this.$emit('options-reset'); // Emit custom event
     },
+
       onDragStart(index, event) {
         const option = this.options[index];
         this.dragging = true;
@@ -126,6 +132,7 @@
     
   }
   this.$emit('sorted-options-updated', this.isSortedOptionsValid);
+  this.$emit('sorted-options', this.sortedOptions);
   this.dragging = false;
   this.dragIndex = null;
   this.hovering = null;

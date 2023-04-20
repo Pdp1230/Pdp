@@ -66,6 +66,7 @@
                     :options="form.questions[answer.index - 1].options"
                     :numberOfOptionsToClassify="form.questions[answer.index - 1].numberOfOptionsToClassify"
                     @sorted-options-updated="onSortedOptionsUpdated"
+                    @sorted-options="getSortedOptions"
                     type="ranking"
 
                   />
@@ -115,6 +116,7 @@ export default {
       isSortedOptionsValid: false,
       numberOfOptionsToClassify: 0,
       rowsCsv: [],
+      sortedOptions: [],
     };
   },
   mounted() {
@@ -122,7 +124,10 @@ export default {
   },
   methods: {
 
-
+    getSortedOptions(val){
+      this.sortedOptions = val;
+      
+    },
     onSortedOptionsUpdated(isValid) {
       this.isSortedOptionsValid = isValid;
 
@@ -226,18 +231,13 @@ export default {
     },
     sendEmail() {
       const formData = this.form;
-
-
-
       const response = this.answers.map((answer, index) => {
         const question = formData.questions[index];
         if (answer.type == "ranking") {
           const rankinganswer = []
-          this.form.questions[answer.index - 1].options.forEach((option) => {
-            const value = option.rank || "null";
-            const label = option.label;
-            rankinganswer.push(`${label} rank : ${value} `);
-          });
+          
+          rankinganswer.push(`${JSON.stringify(this.sortedOptions).replace(/label/g, "Optionlabel")} `);
+
           return `${question.modelQ}: ${rankinganswer}`
         }
 
@@ -286,6 +286,7 @@ export default {
 
         // Add answer for each question
         if (answer.type === "ranking") {
+          console.log(this.sortedOptions);
           this.form.questions[answer.index - 1].options.forEach((option) => {
             const value = option.rank || "null";
             const label = option.label;
