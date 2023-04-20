@@ -1,36 +1,100 @@
 <!-- eslint-disable vue/no-use-computed-property-like-method -->
 <template>
   <div>
-    <div class="row justify-center q-mt-lg">
-      <q-btn size="md" icon="add" color="blue-8" dense round @click="addForm">
-      </q-btn>
-    </div>
-    <div class="row justify-center">
-      <p class="text-caption text-grey-8">
-        Click on this button in order to add a form
-      </p>
+    <div class ="row justify-center">
+      <div class="q-mr-md">
+        <div class="row justify-center q-mt-lg">
+          <q-btn size="md" icon="add" color="blue-8" dense round @click="addForm">
+        </q-btn>
+        </div>
+        <div class="row justify-center">
+          <p class="text-caption text-grey-8">
+            Click to create a form
+          </p>
+        </div>
+      </div>
+      <div class="q-ml-md">
+        <div class="row justify-center q-mt-lg">
+          <q-btn size="md" icon="upload" color="blue-8" dense round @click="loadForm">
+        </q-btn>
+        </div>
+        <div class="row justify-center">
+          <p class="text-caption text-grey-8">
+            Click to upload a form
+          </p>
+        </div>
+      </div>
     </div>
     <q-list dense>
-      <q-item class="row" v-for="form in forms" :key="form.index">
-        <q-item-section class="col-1">
-          <q-item-label>{{ form.title }}</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <div class ="row q-my-md">
-            <q-btn icon="edit" @click="editForm(form)" />
-            <q-btn icon="delete" @click="deleteForm(form.index,form.id)" />
-            <q-btn icon="share" @click="shareForm(form.id)" />
-            <q-btn icon="download" @click="downloadFormJson(form)"/>
+      <q-item class="row justify-center" v-for="form in forms" :key="form.index">
+        <q-card class = "q-py-md q-px-lg q-my-sm card-border bg-grey-2">
+          <q-item-section>
+            <q-item-label class = "row justify-center">{{ form.title }}</q-item-label>
+          </q-item-section>
+          <q-item-section>
+            <div class ="row q-my-md bg-white">
+              <q-btn icon="edit" @click="editForm(form)" />
+              <q-btn icon="delete" @click="deleteForm(form.index,form.id)"/>
+              <q-btn icon="download" @click="downloadFormJson(form)"/>
+              <q-btn icon="assignment" @click="form.resultsShown = !form.resultsShown"/>
+              <q-btn icon="share" @click="shareForm(form.id)" />
+            </div>
+          </q-item-section>
+          <div v-if="form.resultsShown">
+            <q-item class="row justify-center" v-for="answer in form.answers" :key="answer.index">
+              <q-card class="bg-grey-4 card-answer-border" style="max-width: 500px; width: 100%;">
+                <q-card-section class="row items-center">
+                  <q-item-section class="col-auto">
+                    <q-item-label>{{ answer.email }}</q-item-label>
+                    <q-item-label>{{ answer.name }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section class="text-right">
+                    <div>
+                      <q-btn class="bg-white" dense size="md" icon="preview" @click="displayAnswers(form, answer.answers, answer.email, answer.name)" />
+                    </div>
+                  </q-item-section>
+                </q-card-section>
+              </q-card>
+            </q-item>
           </div>
-        </q-item-section>
+        </q-card>
       </q-item>
     </q-list>
+
+    <q-dialog
+      v-model="dialogAnswers"
+      maximized
+      transition-show="slide-up"
+      transition-hide="slide-down"
+      no-esc-dismiss
+    >
+      <div class="bg-grey-2">
+        <div class="row justify-end">
+          <q-btn
+            flat
+            dense
+            round
+            color="red"
+            icon="close"
+            @click="closeAnswersDialog"
+          />
+        </div>
+        <FormResponse 
+          :disabled="true"
+          :formProp="formAnswersDisplay"
+          :answersProp="answersDisplay"
+          :emailProp="emailAnswersDisplay"
+          :nameProp="nameAnswersDisplay"
+        />
+      </div>
+    </q-dialog>
 
     <q-dialog
       v-model="dialogForm"
       maximized
       transition-show="slide-up"
       transition-hide="slide-down"
+      no-esc-dismiss
     >
       <q-card class="bg-grey-2">
         <div class="row justify-end">
@@ -40,41 +104,47 @@
             round
             color="red"
             icon="close"
-            @click="closeDialog"
+            @click="closeFormDialog"
           />
         </div>
         <div class="row col-12 q-ml-md justify-center">
-          <q-input
-            placeholder="Titre du formulaire"
-            hint="obligatory"
-            v-model="actualForm.title"
-            class="col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
-          />
-          <q-btn
-            dense
-            icon="style"
-            label="Change Style"
-            @click="changeFormStyle = !changeFormStyle"
-            flat
-            class="q-ml-md"
-            no-caps
-          />
-        </div>
-        <div v-if="changeFormStyle" class="row q-mt-lg q-mb-md justify-center">
+  <q-card class="card-border bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6">
+    <q-card-section class="q-mt-sm q-mx-md justify-center">
+      <q-input
+        placeholder="Titre du formulaire"
+        hint="obligatory"
+        v-model="actualForm.title"
+        class="col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
+      />
+    </q-card-section>
+    <q-card-section class="row q-mt-sm q-mx-md justify-center">
+      <q-btn
+        dense
+        icon="style"
+        label="Change Style"
+        @click="changeFormStyle = !changeFormStyle"
+        flat
+        class="q-ml-md"
+        no-caps
+      />
+    </q-card-section>
+    <q-card-section class="row q-mt-sm q-mx-md justify-center">
+        <q-card v-if ="changeFormStyle" class="row q-pa-md bg-grey-2">
           <textarea
             id="textcss"
             v-model="style"
-            class="q-input col-md-4 col-sm-12 col-xs-12 col-lg-3 col-xl-3"
-            placeholder="      /* Customize your form here */
-                                .q-input {
-                                  /* Add custom styles */
-                                }
-                                .q-card {
-                                  /* Add custom styles */
-                                }
-                                /* Add more custom styles as needed */"
+            class="q-input justify-center"
+            style="width: 85%; height: 200px;"
+            placeholder="/* Customize your form here */
+              .q-input {
+                /* Add custom styles */
+              }
+              .q-card {
+                /* Add custom styles */
+              }
+              /* Add more custom styles as needed */"
           ></textarea>
-          <div id="textbuttons">
+          <div class="row q-mt-md q-justify-center">
             <q-btn
               dense
               icon="style"
@@ -84,7 +154,12 @@
             />
             <q-btn dense icon="clear" class="q-ml-md" @click="clearStyle" />
           </div>
-        </div>
+        </q-card>
+    </q-card-section>
+  </q-card>
+</div>
+
+        
 
         <div
           class="q-mt-xl"
@@ -93,7 +168,7 @@
         >
           <div class="row justify-center q-mt-md q-ml-md">
             <q-card
-              class="bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6"
+              class="card-border bg-grey-3 col-md-5 col-sm-10 col-xs-10 col-lg-6 col-xl-6"
             >
               <q-card-section class="q-mt-sm q-ml-md justify-center">
                 <div class="row q-my-sm q-ml-md">
@@ -234,11 +309,6 @@
         </div>
       </q-card>
     </q-dialog>
-    
-    <q-btn 
-    @click="loadForm()" 
-    icon="publish"
-    />
   </div>
 </template>
 
@@ -246,15 +316,20 @@
 import { v4 as uuidv4 } from 'uuid';
 import api from 'src/api/api';
 import _ from "lodash";
+import FormResponse from "./Form.vue"
 
 export default {
   name: "formCreator",
+  components: {
+    FormResponse
+  },
   data() {
     return {
       forms: [],
       actualForm: this.initializeForm(),
       actualEditForm: {},
       dialogForm: false,
+      dialogAnswers: false,
       isAddForm: false,
       isEditForm: false,
       cptForms: 0,
@@ -267,7 +342,11 @@ export default {
                       'checkbox',
                       'textarea',
                       'select',
-                    ]
+                    ],
+      formAnswersDisplay : {},
+      answersDisplay : [],
+      emailAnswersDisplay : "",
+      nameAnswersDisplay : "",
     }
   },
   created(){
@@ -315,7 +394,7 @@ export default {
         ],
       }
     },
-    closeDialog() {
+    closeFormDialog() {
       this.actualForm = this.initializeForm();
       this.dialogForm = false;
       this.isAddForm = false;
@@ -588,6 +667,20 @@ export default {
         sessionStorage.removeItem('userEmail');
         this.$router.push({ name: "Login" });
       }
+    },
+    displayAnswers(form,answers,email,name){
+      this.formAnswersDisplay = _.cloneDeep(form);
+      this.answersDisplay = _.cloneDeep(answers);
+      this.emailAnswersDisplay = email;
+      this.nameAnswersDisplay = name;
+      this.dialogAnswers = true;
+    },
+    closeAnswersDialog(){
+      this.dialogAnswers = false;
+      this.formAnswersDisplay = {};
+      this.answersDisplay = [];
+      this.emailAnswersDisplay = "";
+      this.nameAnswersDisplay = "";
     }
   },
 };
@@ -638,4 +731,13 @@ textarea:focus {
   background: none repeat scroll 0 0 #ffffff;
   outline-width: 0;
 }
+
+.card-border {
+  border-left: 3px solid #0d47a1;
+}
+
+.card-answer-border {
+  border-left: 3px solid #212831;
+}
+
 </style>
