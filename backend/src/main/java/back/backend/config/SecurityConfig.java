@@ -38,8 +38,6 @@ public class SecurityConfig {
         .permitAll()
         .requestMatchers("/api/answer/submit/**")
         .permitAll()
-        .requestMatchers("/api/email/send")
-        .permitAll()
         .anyRequest()
         .authenticated()
         .and()

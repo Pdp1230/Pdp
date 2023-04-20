@@ -275,53 +275,6 @@ export default {
         this.$router.push({ name: "Error404" });
       }
     },
-    sendEmail() {
-      const formData = this.form;
-      const response = this.answers.map((answer, index) => {
-        const question = formData.questions[index];
-        if (answer.type == "ranking") {
-          const rankinganswer = []
-          
-          rankinganswer.push(`${JSON.stringify(this.sortedOptions).replace(/label/g, "Optionlabel")} `);
-
-          return `${question.modelQ}: ${rankinganswer}`
-        }
-
-
-        return `${question.modelQ}: ${answer.text ||
-          answer.textArea ||
-          answer.radioChoice ||
-          answer.checkboxChoices || 
-          answer.selectChoice || 
-          answer.selected}`;
-      }).join(';' + '\n');
-
-      const emailRequestOwner = {
-        toEmail: sessionStorage.getItem('userEmail'),
-        subject: "Réponse au formulaire : " + formData.title,
-        body: this.name + " à répondue au formulaire ses réponses sont : \n" + response,
-      };
-
-      const emailRequestUser = { toEmail: this.email, subject: 'Form awnser', body: 'Thanks for awnsering our form' };
-
-      api.post('/email/send', emailRequestUser)
-        .then(response => {
-          console.log(response);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-      api.post('/email/send', emailRequestOwner)
-        .then(response => {
-          console.log(response);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-
-
-    },
-
     addtocsv() {
 
 
@@ -371,10 +324,8 @@ export default {
       }
     },
     submitForm() {
-      this.sendEmail();
       this.addtocsv();
       this.postAnswers();
-      // Clear the input values
       this.clearForm();
     },
   },
