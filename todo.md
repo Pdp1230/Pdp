@@ -13,7 +13,7 @@
 - [x] (Oussama) Create new endpoint for getting answers of a form
 - [x] Treat requests of type edit
 - [x] Treat requests of type  remove a form
-- [ ] Fix bug if style isn't empty the form is not handeled
+- [x] Fix bug if style isn't empty the form is not handeled
 
 ## FRONT-END
 
