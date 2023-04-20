@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 public class FormAnswerResponse {
     private String name;
     private String email;
-    private List<QuestionAnswerResponse> questionAnswersResponse;
+    private Integer index;
+    private List<QuestionAnswerResponse> answers;
 }

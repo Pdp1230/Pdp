@@ -1,5 +1,6 @@
 package back.backend.controller.forms;
 
+import back.backend.controller.answers.AnswerService;
 import back.backend.controller.forms.form.FormRequest;
 import back.backend.controller.forms.form.FormResponse;
 import back.backend.controller.forms.option.OptionRequest;
@@ -36,6 +37,7 @@ public class FormService {
     private final OptionRepository optionRepository;
     private final FormAnswerRepository formAnswerRepository;
     private final QuestionAnswerRepository questionAnswerRepository;
+    private final AnswerService answerService;
 
     public FormsResponse getForms(){
         List<Form> forms = formRepository.findAllByUser(user());
@@ -73,6 +75,7 @@ public class FormService {
                             .index(form.getFormIndex())
                             .cptQuestions(questions.size())
                             .questions(questionsResponse)
+                            .answers(answerService.getFormAnswers(form.getFetchId()))
                             .build()
             );
         }
@@ -114,7 +117,6 @@ public class FormService {
                             .title(form.getTitle())
                             .style(form.getStyle())
                             .id(form.getFetchId())
-                            .cptQuestions(questions.size())
                             .questions(questionsResponse)
                             .build()
         ;

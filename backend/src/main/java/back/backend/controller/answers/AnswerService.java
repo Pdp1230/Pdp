@@ -34,9 +34,8 @@ public class AnswerService {
             .form(form)
             .email(formAnswerRequest.getEmail())
             .name(formAnswerRequest.getName())
-            .formAnswerIndex(form.getFormAnswers().length)
+            .formAnswerIndex(formAnswerRepository.findAllByForm(form).size()+1)
             .build());
-
         for(var questionAnswerRequest: formAnswerRequest.getAnswers()){
             var questionAnswerBuilder = QuestionAnswer.builder()
                 .formAnswer(formAnswer)
@@ -93,7 +92,8 @@ public class AnswerService {
             formAnswersResponse.add(FormAnswerResponse.builder()
                 .email(formAnswer.getEmail())
                 .name(formAnswer.getName())
-                .questionAnswersResponse(questtionAnswersResponse)
+                .index(formAnswer.getFormAnswerIndex())
+                .answers(questtionAnswersResponse)
                 .build()
             );
         }

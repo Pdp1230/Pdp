@@ -2,6 +2,7 @@ package back.backend.controller.forms.form;
 
 import java.util.List;
 
+import back.backend.controller.answers.responses.FormAnswerResponse;
 import back.backend.controller.forms.question.QuestionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,4 +20,5 @@ public class FormResponse {
     private Integer index;
     private Integer cptQuestions;
     private List<QuestionResponse> questions;
+    private List<FormAnswerResponse> answers;
 }
