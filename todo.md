@@ -29,4 +29,4 @@
 - [x] (Ismail) Add RankingQuestion component, props are: options: Array of {label: string, index: integer} that can be dragged and dropped when displaying, and numberOfElementsToClassify: integer to display a separator
 - [ ] (Firas) Integrate RankingQuestion in Form.vue
 - [ ] (Ismail) If style exists apply it to Form.vue(style is stocked in this.form.style)
-- [ ] (Firas+Oussama) Show answers of a given form.
+- [x] (Firas+Oussama) Show answers of a given form.
