@@ -65,13 +65,14 @@
                   <span v-if="form.questions[answer.index - 1].numberOfOptionsToClassify > 1">You have to classify {{ form.questions[answer.index - 1].numberOfOptionsToClassify }} options</span>
                   <span v-if="form.questions[answer.index - 1].numberOfOptionsToClassify <= 1">You have to classify {{ form.questions[answer.index - 1].numberOfOptionsToClassify }} option</span>
                   <DraggableOptionGroup
-                    v-model="answer.selected"
+                    :modelValue="answer.RankingOrder"
                     :options="form.questions[answer.index - 1].options"
                     :numberOfOptionsToClassify="form.questions[answer.index - 1].numberOfOptionsToClassify"
                     @sorted-options-updated="onSortedOptionsUpdated"
                     @sorted-options="getSortedOptions"
                     type="ranking"
                     :draggable="!disabled"
+                    @update:modelValue="newValue => answer.RankingOrder = newValue"
                   />
                 </div>
                 <div v-if="answer.type === 'select'" class="q-gutter-md">
@@ -147,11 +148,13 @@ export default {
       name: "",
       formStyle: "",
       isSortedOptionsValid: false,
+      totalclassify:0,
       numberOfOptionsToClassify: 0,
       rowsCsv: [],
       sortedOptions: [],
     };
   },
+  
   mounted() {
     if(this.disabled){
       this.form = _.cloneDeep(this.formProp);
@@ -172,13 +175,37 @@ export default {
 
     getSortedOptions(val){
       this.sortedOptions = val;
+      this.answers.forEach((answer) =>{
+        if(answer.type == "ranking"){
+          
+          
+        }
+        
+      });
+      
       
     },
+    totalNumberOfOptionsToClassify() {
+      let sum =0;
+      this.form.questions.forEach((question) => {
+        if (question.type === 'ranking') {
+          sum +=1;
+      }
+        
+      });
+      return sum;
+    },
+
     onSortedOptionsUpdated(isValid) {
-      this.isSortedOptionsValid = isValid;
+      if(this.totalclassify<1)
+      this.totalclassify = 0;
+
+      this.totalclassify += isValid;
+      console.log(this.totalclassify);
+      this.isSortedOptionsValid= (this.totalclassify==this.totalNumberOfOptionsToClassify());
 
     },
-    currentNumberOfOptionsToClassify() {
+    currentNumberOfOptionsToClassify(){
       return this.numberOfOptionsToClassify;
     },
 
@@ -242,7 +269,7 @@ export default {
                 index: question.index,
                 type: question.type,
                 numberOfOptionsToClassify: question.numberOfOptionsToClassify,
-                textarea: "",
+                RankingOrder: [],
               });
               break;
             case "radio":
@@ -284,30 +311,26 @@ export default {
         const row = [];
 
         // Add answer for each question
-        if (answer.type === "ranking") {
-          console.log(this.sortedOptions);
-          this.form.questions[answer.index - 1].options.forEach((option) => {
-            const value = option.rank || "null";
-            const label = option.label;
-            row.push(`${label}:${value}`);
-          });
-        } else {
-          const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textArea || "";
+
+          const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textArea || answer.RankingOrder || "";
+
           row.push(value);
-        }
+  
 
         start.push(row.join(","));
       });
-      this.rowsCsv.push(start + "\n")
-
+      this.rowsCsv.push(start + "\n");
     },
 
     clearForm() {
     this.email = '';
     this.name = '';
+
+
       
     },
     async postAnswers(){
+      
       const data = {
         email: this.email,
         name: this.name,
