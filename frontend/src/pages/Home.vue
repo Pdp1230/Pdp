@@ -38,6 +38,8 @@
               <q-btn icon="download" @click="downloadFormJson(form)"/>
               <q-btn icon="assignment" @click="form.resultsShown = !form.resultsShown"/>
               <q-btn icon="share" @click="shareForm(form.id)" />
+              <q-btn v-if="form.resultsShown" icon="source" @click="exportToCsv(form)" />
+              
             </div>
           </q-item-section>
           <div v-if="form.resultsShown">
@@ -668,6 +670,36 @@ export default {
         this.$router.push({ name: "Login" });
       }
     },
+    async exportToCsv(form) {
+    // Fetch the responses from the API
+    const answers = form.answers;
+
+    // Create the CSV content
+    let csvContent = "Name;Email;";
+    csvContent += form.questions.map((question) => question.modelQ + " type :" +question.type ).join("; ");
+    csvContent += "\n";
+
+    answers.forEach((response) => {
+      csvContent += `${response.name}; ${response.email}; `;
+
+      response.answers.forEach((answer) => {
+        if(answer.type == "ranking"){
+          csvContent += answer.rankingOrder.map((item) => item.label + " ranked " + item.rank).join(", ");
+        }
+        csvContent += answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textArea || "";
+        csvContent += "; "
+      });
+
+      csvContent += "\n";
+    });
+
+    // Download the CSV file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${form.title} - Responses.csv`;
+    link.click();
+  },
     displayAnswers(form,answers,email,name){
       this.formAnswersDisplay = _.cloneDeep(form);
       this.answersDisplay = _.cloneDeep(answers);

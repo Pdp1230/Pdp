@@ -22,11 +22,11 @@
 - [x] Redirect user to home page after successful login
 - [x] load user's existing data by parsing the backend response.
 - [x] Send request to API in order to add,
-- [ ] Edit, or remove a form
+- [x] Edit, or remove a form
 - [ ] Show messages after sign-in and sign-up attempts.
-- [ ] Add import form from JSON functionnality.
+- [x] Add import form from JSON functionnality.
 - [x] (Firas) Add 'ranking' question type to Home.vue.
 - [x] (Ismail) Add RankingQuestion component, props are: options: Array of {label: string, index: integer} that can be dragged and dropped when displaying, and numberOfElementsToClassify: integer to display a separator
-- [ ] (Firas) Integrate RankingQuestion in Form.vue
-- [ ] (Ismail) If style exists apply it to Form.vue(style is stocked in this.form.style)
+- [x] (Firas) Integrate RankingQuestion in Form.vue
+- [x] (Ismail) If style exists apply it to Form.vue(style is stocked in this.form.style)
 - [x] (Firas+Oussama) Show answers of a given form.

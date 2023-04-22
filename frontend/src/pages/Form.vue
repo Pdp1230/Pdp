@@ -93,7 +93,6 @@
       <div class="row justify-center q-my-xl">
         <q-btn v-if="!disabled && currentNumberOfOptionsToClassify() == 0" type="submit" label="Submit"  />
         <q-btn v-if="!disabled && currentNumberOfOptionsToClassify() != 0" type="submit" :disabled="!isSortedOptionsValid" label="Submit" />
-        <q-btn v-if="disabled" icon="ios_share" @click="exportToCSV" title='Export to csv' />
     </div>
     </div>
     </form>
@@ -209,29 +208,7 @@ export default {
       return this.numberOfOptionsToClassify;
     },
 
-    async exportToCSV() {
-      const header = ["Email Address", "Full Name"];
-      // Add header for each question
-      this.form.questions.forEach((question) => {
-        header.push(`${question.modelQ}:type(${question.type})`);
-      });
-      const start = [this.email, this.name]; // create new row for each answer
-      // Create CSV file
-      const csv = [header.join(",") + "\n", ...this.rowsCsv].join("");
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
 
-      // Download CSV file
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `${this.form.title}.csv`);
-      link.style.visibility = "hidden";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    }
-    ,
     async loadForm() {
       try {
         const response = await api.get(`/form/getform/${this.id}`);
@@ -302,25 +279,7 @@ export default {
         this.$router.push({ name: "Error404" });
       }
     },
-    addtocsv() {
-
-
-      const start = [this.email, this.name]; // create new row for each answer
-      // Add row for each response
-      this.answers.forEach((answer) => {
-        const row = [];
-
-        // Add answer for each question
-
-          const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textArea || answer.rankingOrder || "";
-
-          row.push(value);
-  
-
-        start.push(row.join(","));
-      });
-      this.rowsCsv.push(start + "\n");
-    },
+   
 
     clearForm() {
     this.email = '';
