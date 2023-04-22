@@ -1,5 +1,5 @@
   <template>
-      <div>
+      <div v-if="draggable">
         <div
           v-for="(option, index) in options"
           :key="index"
@@ -23,6 +23,30 @@
           </div>
         </div>
         <q-btn icon="restart_alt" ref="childButton" :disabled="(this.sortedOptions.length == 0)" @click="resetOptions"/>
+      </div>
+      <div v-else>
+        <div
+          v-for="(option, index) in modelValue"
+          :key="index"
+          class="drag-option"
+          :class="{
+            'dragging': dragging && dragIndex === index,
+            'over': hovering === index,
+            'sorted': option.sorted,
+          }"
+          :draggable="draggable"
+          @dragstart="onDragStart(index, $event)"
+          @dragover="onDragOver(index, $event)"
+          @drop="onDrop(index, $event)"
+          
+        >
+          <div class="drag-handle">
+            {{ option.label }}
+          </div>
+          <div class="rank-box">
+            <span class="indicator-number">{{ option.rank }}</span>
+          </div>
+        </div>
       </div>
     </template>
     
