@@ -21,9 +21,9 @@ const routes = [
         props:true
       },
       {
-        path: "submit",
-        component: () => import("pages/Submit.vue"),
-        name: "Submit",
+        path: "prototype",
+        component: () => import("src/pages/Prototype.vue"),
+        name: "Prototype",
       },
     ],
   },
