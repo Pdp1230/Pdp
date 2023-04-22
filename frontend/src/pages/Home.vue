@@ -686,7 +686,8 @@ export default {
         if(answer.type == "ranking"){
           csvContent += answer.rankingOrder.map((item) => item.label + " ranked " + item.rank).join(", ");
         }
-        csvContent += answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textArea || "";
+        else{ csvContent += answer.type || "";}
+       
         csvContent += "; "
       });
 
