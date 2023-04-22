@@ -65,14 +65,14 @@
                   <span v-if="form.questions[answer.index - 1].numberOfOptionsToClassify > 1">You have to classify {{ form.questions[answer.index - 1].numberOfOptionsToClassify }} options</span>
                   <span v-if="form.questions[answer.index - 1].numberOfOptionsToClassify <= 1">You have to classify {{ form.questions[answer.index - 1].numberOfOptionsToClassify }} option</span>
                   <DraggableOptionGroup
-                    :modelValue="answer.RankingOrder"
+                    :modelValue="answer.rankingOrder"
                     :options="form.questions[answer.index - 1].options"
                     :numberOfOptionsToClassify="form.questions[answer.index - 1].numberOfOptionsToClassify"
                     @sorted-options-updated="onSortedOptionsUpdated"
                     @sorted-options="getSortedOptions"
                     type="ranking"
                     :draggable="!disabled"
-                    @update:modelValue="newValue => answer.RankingOrder = newValue"
+                    @update:modelValue="newValue => answer.rankingOrder = newValue"
                   />
                 </div>
                 <div v-if="answer.type === 'select'" class="q-gutter-md">
@@ -167,6 +167,7 @@ export default {
       this.answers = _.cloneDeep(this.answersProp);
       this.email = this.emailProp;
       this.name = this.nameProp;
+      console.log(this.answers);
     }
     else
       this.loadForm();
@@ -201,7 +202,6 @@ export default {
       this.totalclassify = 0;
 
       this.totalclassify += isValid;
-      console.log(this.totalclassify);
       this.isSortedOptionsValid= (this.totalclassify==this.totalNumberOfOptionsToClassify());
 
     },
@@ -269,7 +269,7 @@ export default {
                 index: question.index,
                 type: question.type,
                 numberOfOptionsToClassify: question.numberOfOptionsToClassify,
-                RankingOrder: [],
+                rankingOrder: [],
               });
               break;
             case "radio":
@@ -312,7 +312,7 @@ export default {
 
         // Add answer for each question
 
-          const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textArea || answer.RankingOrder || "";
+          const value = answer.selectChoice || answer.checkboxChoices || answer.radioChoice || answer.text || answer.textArea || answer.rankingOrder || "";
 
           row.push(value);
   
@@ -337,6 +337,7 @@ export default {
         answers: this.answers
       }
       try{
+        console.log(data);
         const response = await api.post(`/answer/submit/${this.id}`,data);
 
         if (response.status !== 200) {
