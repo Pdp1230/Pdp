@@ -17,4 +17,5 @@ public class QuestionAnswerRequest {
     private Integer radioChoice;
     private Integer selectChoice;
     private Integer[] checkboxChoices;
+    private RankingOrderRequest[] rankingOrder;
 }
