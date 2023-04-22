@@ -8,12 +8,14 @@ import back.backend.controller.forms.option.OptionResponse;
 import back.backend.controller.forms.question.QuestionRequest;
 import back.backend.controller.forms.question.QuestionResponse;
 import back.backend.entity.answers.FormAnswer;
+import back.backend.entity.answers.QuestionAnswer;
 import back.backend.entity.forms.Form;
 import back.backend.entity.forms.Option;
 import back.backend.entity.forms.Question;
 import back.backend.entity.user.User;
 import back.backend.repository.answers.FormAnswerRepository;
 import back.backend.repository.answers.QuestionAnswerRepository;
+import back.backend.repository.answers.RankingOrderRepository;
 import back.backend.repository.forms.FormRepository;
 import back.backend.repository.forms.OptionRepository;
 import back.backend.repository.forms.QuestionRepository;
@@ -37,6 +39,7 @@ public class FormService {
     private final OptionRepository optionRepository;
     private final FormAnswerRepository formAnswerRepository;
     private final QuestionAnswerRepository questionAnswerRepository;
+    private final RankingOrderRepository rankingOrderRepository;
     private final AnswerService answerService;
 
     public FormsResponse getForms(){
@@ -208,7 +211,11 @@ public class FormService {
     private void deleteFormDependencies(Form form){
         List<FormAnswer> formAnswers = formAnswerRepository.findAllByForm(form);
         for(var formAnswer : formAnswers){
-            questionAnswerRepository.deleteAllByFormAnswer(formAnswer);
+            List<QuestionAnswer> questionAnswers = questionAnswerRepository.findAllByFormAnswer(formAnswer);
+            for(var questionAnswer : questionAnswers){
+                rankingOrderRepository.deleteAllByQuestionAnswer(questionAnswer);
+                questionAnswerRepository.delete(questionAnswer);
+            }
             formAnswerRepository.delete(formAnswer);
         }
 
