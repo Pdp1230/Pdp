@@ -307,7 +307,6 @@ export default {
       }
     },
     submitForm() {
-      this.addtocsv();
       this.postAnswers();
       this.clearForm();
     },
