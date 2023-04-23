@@ -11,22 +11,113 @@
 \maketitle
 
 \section{Introduction}
-Ce document a pour but de décrire les besoins pour un logiciel de questionnaire/sondage avec des fonctionnalités spécifiques manquantes dans la plupart des alternatives existantes. Ce projet est réalisé dans le cadre de l'UE de projet de programmation du master informatique de l'université de Bordeaux.
+Ce document présente les besoins pour un nouveau logiciel de questionnaire/sondage qui vise à combler les fonctionnalités manquantes dans la plupart des alternatives existantes. La création de ce logiciel répond à la nécessité d'offrir aux utilisateurs une solution plus complète et plus efficace pour la création et la gestion de sondages en ligne. Le projet est réalisé dans le cadre de l’UE de projet de programmation du master informatique de l’université de Bordeaux.
 
 \section{Description des besoins généraux et du domaine}
-Le projet consiste à créer un site de questionnaire. Pour avoir un site de questionnaire fonctionnel, il doit être possible de créer un questionnaire, de l'envoyer à d'autres personnes, que ces personnes puissent y répondre et enfin que le créateur du questionnaire puisse récupérer les réponses. Cependant, ce projet se concentre sur la mise en place d'un certain nombre de propriétés supplémentaires :
-\begin{itemize}[noitemsep]
-\item La possibilité d'établir un ordre de préférence entre différents choix.
-\item L'envoi automatique d'un mail personnalisé aux utilisateurs qui répondent à un questionnaire.
-\item La possibilité d'importer et d'exporter un questionnaire dans un format texte comme par exemple JSON.
-\item L'existence d'un outil de personnalisation graphique de questionnaire orienté vers une utilisation pour des informaticiens.
-\item Avoir une accessibilité des données relative à un questionnaire restreinte à l'administrateur du questionnaire seulement. Et en particulier non accessible par l'administrateur du site en lui-même.
+
+Le projet consiste à développer un site de questionnaire qui permettra à des enquêteurs de créer des questionnaires, de les envoyer à des sondé·e·s, de récupérer leurs réponses et d'analyser les résultats. Les différentes fonctionnalités à implémenter dans le site incluent :
+
+\subsection{Interface pour les enquêteurs}
+
+L'interface doit permettre aux enquêteurs de créer et de modifier des questionnaires. Ils/Elles doivent également pouvoir importer et exporter des questionnaires et des réponses dans un format texte, comme JSON. Pour faciliter la personnalisation des questionnaires, il doit y avoir un outil de personnalisation graphique orienté vers une utilisation pour des informaticien·ne·s.
+
+\subsection{Composants du questionnaire}
+
+Les enquêteurs doivent pouvoir ajouter des questions classiques ainsi que des questions permettant d'établir un ordre de préférence entre différents choix.
+
+\subsection{Actions automatisées}
+
+Une fois qu'un sondé·e a répondu à un questionnaire, il/elle doit recevoir automatiquement un mail personnalisé de remerciement.
+
+\subsection{Confidentialité des données}
+
+Les données collectées doivent être accessibles uniquement aux enquêteurs, et non aux Administrateurs du site. L'interface du site doit également garantir une accessibilité relative à un questionnaire restreinte à l’administrateur du questionnaire seulement.
+
+Pour définir les besoins de ce projet de manière plus précise, il est important de se référer à l'état de l'art des logiciels existants et d'analyser les caractéristiques de ces outils. Cette analyse permettra de déterminer les fonctionnalités manquantes ou rares dans l'existant et d'y apporter des solutions pertinentes.
+
+Il est également important de définir les différents types d'utilisateurs du site :
+
+\begin{itemize}
+\item Sondé·e·s : les personnes répondant aux questionnaires
+\item enquêteurs : les personnes créant un questionnaire et accédant aux réponses
+\item Administrateurs : les personnes gérant le site web hébergeant l'application.
 \end{itemize}
-Il n'est pas question de rivaliser avec les alternatives existantes, mais plutôt de se concentrer sur les fonctionnalités manquantes ou rares dans l'existant tout en prodiguant les fonctionnalités de base attendues pour ce genre d'outils. Les deux ensembles de propriétés sont explicitement listés ci-dessus.
+
+Enfin, pour garantir la pertinence des fonctionnalités à implémenter dans le site, il convient d'analyser les caractéristiques des logiciels existants et d'identifier les lacunes ou les fonctionnalités rares dans ces outils. Cela permettra d'apporter des solutions efficaces pour les utilisateurs ciblés par le site.
 
 \section{Description de l'existant}
 Les alternatives existantes pour les questionnaires et les sondages incluent Google Forms, LimeSurvey, Microsoft Forms, Survey Monkey, Framaforms, etc.
 \section{Description des besoins}
+
+
+\subsection{Fonctionnels}
+\begin{enumerate}[noitemsep]
+\item Créer un questionnaire:
+\begin{itemize}[noitemsep]
+\item \textbf{Priorités : }Essentiel. Propriété nécessaire, sans cela il n'y a pas de site.
+\item \textbf{Robustesse : } La création de questionnaire doit être robuste, fiable et sans bugs, car c'est le premier contact des enquêteurs avec l'outil. Les enquêteurs doivent pouvoir créer des questionnaires sans rencontrer de problèmes techniques.
+\item \textbf{Faisabilité : }Oui.
+\item \textbf{Difficultés techniques: } Injection de code "en temps réel" par l'utilisateur.
+\end{itemize}
+\newpage
+\item Import/export de fichiers texte (JSON):
+\begin{itemize}[noitemsep]
+    \item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
+
+    \item \textbf{Robustesse : }Il est important que le site assure la robustesse de l'import/export de fichiers texte (JSON), car cela garantit que les questionnaires seront bien générés en accord avec les fichiers texte importés. Il est donc important de minimiser les bugs, en particulier ceux qui compromettent l'utilisation de l'application ou qui sont récurrents. En cas d'entrée invalide (champs manquants, champs non-supportés, syntaxe invalide), une erreur explicite doit informer l'enquêteur pour qu'il puisse corriger les erreurs et importer/exporter les fichiers sans trop d'attente.
+    \item \textbf{Faisabilité : }Oui, implémenté dans des prototypes.
+    \item \textbf{Difficultés techniques: } La transcription texte vers code et code vers texte qui se doit d'être relativement unique.
+\end{itemize}
+
+
+
+\item Récupérer les données d'un questionnaire.
+\begin{itemize}[noitemsep]
+    \item \textbf{Priorités : }Essentiel. Il est essentiel que le site permette la récupération des données d'un questionnaire dans un format CSV, car ce format est largement utilisé. De plus, il est souhaitable que le site supporte également le format JSON pour la récupération des données d'un questionnaire. La prise en charge de ces deux formats permettra une utilisation plus flexible de l'outil pour les enquêteurs et les autres utilisateurs. Cette fonctionnalité est considérée comme essentielle et nécessaire pour assurer une utilisation efficace de l'outil de questionnaire.
+
+    \item \textbf{Robustesse : }Importante,Il est important que le site permette la récupération des données d'un questionnaire de manière fiable et robuste. Les enquêteurs doivent pouvoir accéder aux résultats des questionnaires sans interruption de service ni perte de données. Si des bugs surviennent, ils doivent être résolus dans un délai raisonnable pour garantir la disponibilité des données collectées. Il est donc essentiel que le site soit robuste et fiable pour assurer l'accès aux données collectées et éviter toute perte de données importante.\\
+
+    \item \textbf{Faisabilité : }Oui.\\
+    \item \textbf{Difficultés techniques: } Récupérer les informations de plusieurs utilisateurs "répondant". Rassembler ces données en une structure lisible et accessible seulement par le créateur du questionnaire.
+\end{itemize}
+\newpage
+\item Plusieurs types de réponse :\\
+Le site doit permettre plusieurs types de réponse pour les questions posées dans les questionnaires :
+\begin{itemize}
+\item \textbf{Questions basiques :} réponse texte, réponse oui/non, case à cocher (checkbox) et bouton radio (radio button).
+\item \textbf{Questions avancées :} ordre de préférence entre plusieurs choix, tableaux et classement.
+\end{itemize}
+
+Il est important de détailler chaque type de réponse afin de garantir leur compréhension par les enquêteurs. Les fonctionnalités associées à chaque type de réponse doivent être précisées pour permettre aux enquêteurs de les utiliser correctement dans leurs questionnaires. Il est également essentiel de faire la distinction entre les checkbox et les radio button pour éviter toute confusion lors de la création des questionnaires.
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Priorités : }Il est essentiel que le site permette plusieurs types de réponse pour les questions posées dans les questionnaires, afin de répondre aux besoins des enquêteurs. Cependant, il n'est pas indispensable d'avoir tous les types de réponse disponibles sur le site. Il est recommandé d'avoir au moins les types de réponse basiques tels que la réponse texte, la réponse oui/non, la case à cocher et le bouton radio. En outre, la première fonctionnalité à implémenter est l'ordre de préférence entre plusieurs choix, qui est un type de réponse avancé. Il est donc important d'implémenter ce type de réponse avant les autres types de réponse avancés tels que les tableaux et le classement.
+    \item \textbf{Faisabilité : }Oui, Il est faisable de mettre en place plusieurs types de réponse pour les questions posées dans les questionnaires, car l'existant le permet et des prototypes ont été réalisés avec succès pour concaténer différents types de questions dans un questionnaire. Cependant, il peut y avoir des difficultés particulières pour certains types de réponse, qui devront être identifiées et résolues au cours du développement de l'outil. Il est donc important de tester la faisabilité de chaque type de réponse avant leur implémentation sur le site.
+    \item \textbf{Difficultés techniques: }Il peut y avoir des difficultés techniques pour mettre en place certains types de réponse, notamment pour l'ordre de préférence entre plusieurs choix. Il peut être difficile de permettre un ordonnancement partiel, c'est-à-dire ne pas obliger l'utilisateur à ordonner toutes les possibilités, surtout si le nombre de choix est élevé. Cependant, il est important de déterminer la meilleure façon d'implémenter chaque type de réponse afin de garantir leur bon fonctionnement et leur utilisation facile par les enquêteur.
+\end{itemize}
+
+\newpage
+
+\item Personnalisation par informaticien(ne)
+\begin{itemize}[noitemsep]
+\item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
+\item \textbf{Faisabilité : }Oui, modifier la mise en page d'un site est loin d'être impossible, d'autant plus qu'ici cela vise une variété restreinte d'objets. Si ces objets sont bien structurés, il ne devrait y avoir aucun mal à les composer entre eux et de faire en sorte que leurs aspects n'interagissent pas négativement entre eux.
+\item \textbf{Difficultés techniques: } D'une part, l'insertion de code et d'autre part, faire en sorte que le questionnaire reste cohérent avec cette injection. Il faut faire attention à bien séparer l'affichage du reste du code et qu'il ne puisse pas y avoir d'effets indésirables. Il faudra aussi s'assurer de la cohérence de l'affichage du questionnaire peu importe les personnalisation apportées par l'utilisateur.
+\end{itemize}
+
+
+\item Envoi automatique d'un mail à la fin du remplissage.
+\begin{itemize}[noitemsep]
+    \item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
+    \item \textbf{Vitesse : }Il ne semble pas nécessaire que l'envoi soit instantané, mais il ne faut pas non plus qu'il ait lieu plusieurs heures après l'envoi des réponses au questionnaire. Au plus quelques minutes de latence $(<10min)$.
+    \item \textbf{Robustesse : }Il est relativement important que le site assure la robustesse de l'envoi automatique d'un mail à la fin du remplissage du questionnaire, car cela peut servir de confirmation que le questionnaire a bien été rempli ou avoir d'autres utilités pour l'enquêteur. Pour garantir cet envoi, il est recommandé d'effectuer une vérification de l'adresse e-mail fournie par le sondé·e dès le début du questionnaire. En cas d'échec de l'envoi du mail, il est important que l'enquêteur soit informé pour qu'elle puisse prendre des mesures pour assurer la réception du mail par la personne ayant rempli le questionnaire.
+    \item \textbf{Faisabilité : }Oui, il est possible d'automatiser l'envoi de mails personnalisés.
+    \item \textbf{Difficultés techniques: } Gérer les cas de mauvaises adresses mail ou de réponses, par exemple.
+\end{itemize}
+
+\end{enumerate}
+
+
 \subsection{Non fonctionnels}
 \begin{enumerate}[noitemsep]
 \item Confidentialité des données vis-à-vis de l'administrateur réseau.
@@ -37,94 +128,21 @@ Les alternatives existantes pour les questionnaires et les sondages incluent Goo
 \item \textbf{Difficultés techniques: } À approfondir également.
 \end{itemize}
 
-
-\begin{itemize}[noitemsep]
-\item \textbf{Priorités : }Importante, spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
-\item \textbf{Faisabilité : } Difficile sur le papier en ayant choisi de travailler avec un framework. Cependant, le framework Quasar que nous avons choisi d'utiliser comporte une commande permettant d'éliminer les dépendances non nécessaires à l'application, ce qui permet de grandement réduire la quantité de dépendance par rapport à une utilisation naïve d'un framework.
-\item \textbf{Difficultés techniques: } À déterminer.
-\end{itemize}
-\item Personnalisation par informaticien(ne)
-\begin{itemize}[noitemsep]
-\item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
-\item \textbf{Faisabilité : }Oui, modifier la mise en page d'un site est loin d'être impossible, d'autant plus qu'ici cela vise une variété restreinte d'objets. Si ces objets sont bien structurés, il ne devrait y avoir aucun mal à les composer entre eux et de faire en sorte que leurs aspects n'interagissent pas négativement entre eux.
-\item \textbf{Difficultés techniques: } D'une part, l'insertion de code et d'autre part, faire en sorte que le questionnaire reste cohérent avec cette injection. Il faut faire attention à bien séparer l'affichage du reste du code et qu'il ne puisse pas y avoir d'effets indésirables. Il faudra aussi s'assurer de la cohérence de l'affichage du questionnaire peu importe les personnalisation apportées par l'utilisateur.
-\end{itemize}
-\newpage
 \item Versions téléphone.
 \begin{itemize}[noitemsep]
 \item \textbf{Priorités : }Bonus. Non nécessaire et non spécifié, mais intéressant tout de même.
-\item \textbf{Faisabilité : } Oui, il semble tout à fait raisonnable de penser qu'un créateur de questionnaire ait une version téléphone, c'est d'ailleurs le cas pour certains existants.
-\item \textbf{Difficultés techniques: } À définir.
-\end{itemize}
-\end{enumerate}
-
-\subsection{Fonctionnels}
-\begin{enumerate}[noitemsep]
-\item Créer un questionnaire.
-\begin{itemize}[noitemsep]
-\item \textbf{Priorités : }Essentiel. Propriété nécessaire, sans cela il n'y a pas de site.
-\item \textbf{Robustesse : }Peu importante, on peut se permettre qu'il y ait parfois des bugs lors de la création de questionnaire, tant que ces bugs ne sont pas récurrents et n'impactent pas les autres potentielles applications en cours de fonctionnement chez l'utilisateur.
-\item \textbf{Faisabilité : }Oui.
-\item \textbf{Difficultés techniques: } Injection de code "en temps réel" par l'utilisateur.
-\end{itemize}
-
-\item Récupérer les données d'un questionnaire.
-\begin{itemize}[noitemsep]
-    \item \textbf{Priorités : }Essentiel. Propriété nécessaire, sans cela il n'y a pas de site.
-    \item \textbf{Robustesse : }Importante, si un questionnaire est créé et rempli, il est problématique de ne pas pouvoir accéder aux résultats. Si ce sont des bugs qui impliquent une impossibilité temporaire d'accéder aux données, alors cela est raisonnable, si les données demeurent à jamais inaccessibles, cela ne l'est plus.
-    \item \textbf{Faisabilité : }Oui.
-    \item \textbf{Difficultés techniques: } Récupérer les informations de plusieurs utilisateurs "répondant", et cela sur une plage horaire arbitraire. Rassembler ces données en une structure lisible et accessible seulement par le créateur du questionnaire.
-\end{itemize}
-\newpage
-\item Plusieurs types de réponse :
-\begin{enumerate}[noitemsep]
-    \item ordre de préférence entre plusieurs choix.
-    \item réponse texte.
-    \item réponse oui/non.
-    \item case à cocher.
-    \item tableaux.
-    \item classement
-    \item autres...
-\end{enumerate}
-
-\begin{itemize}[noitemsep]
-    \item \textbf{Priorités : }Essentiel. Propriété nécessaire, il n'est pas question de faire des questionnaires n'ayant que des réponses oui/non. La première fonctionnalité du cahier des charges est de pouvoir établir un ordre entre plusieurs choix, il faut au moins cela.
-    \item \textbf{Faisabilité : }Oui, l'existant le fait bien et des prototypes mis en place de notre côté montrent aussi qu'il est possible de créer et concaténer différents types de questions dans un questionnaire.
-    \item \textbf{Difficultés techniques: }Pour l'ordre par exemple, permettre que l'ordonnancement soit partiel et qu'il ne soit pas nécessaire d'ordonner toutes les possibilités. Cela est particulièrement utile s'il y en a beaucoup.
-\end{itemize}
-\item Envoi automatique d'un mail à la fin du remplissage.
-\begin{itemize}[noitemsep]
-    \item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
-    \item \textbf{Vitesse : }Rapide, moins de 2 minutes. Il ne semble pas nécessaire que l'envoi soit instantané, mais il ne faut pas non plus qu'il ait lieu plusieurs heures après l'envoi des réponses au questionnaire. Au plus quelques minutes de latence.
-    \item \textbf{Robustesse : }Relativement importante. L'e-mail peut servir comme confirmation que le questionnaire a bien été rempli ou avoir d'autres utilités, il faut être quasi-certain qu'un questionnaire rempli implique un e-mail envoyé (à la bonne personne).
-    \item \textbf{Faisabilité : }Oui, il est possible d'automatiser l'envoi de mails personnalisés.
-    \item \textbf{Difficultés techniques: } Gérer les cas de mauvaises adresses mail ou de réponses, par exemple.
-\end{itemize}
-\newpage
-\item Import/export de fichiers texte (JSON).
-\begin{itemize}[noitemsep]
-    \item \textbf{Priorités : }Importante. Spécifié dans le cahier des charges, mais non nécessaire au bon fonctionnement du site.
-    \item \textbf{Vitesse : }Très rapide, pas plus de 2 secondes. Il ne doit pas se passer plusieurs minutes entre l'import d'un fichier et la création du questionnaire associé, autrement autant le faire "à la main".
-    \item \textbf{Robustesse : }Relativement importante, on veut que les questionnaires soient bien générés en accord avec les fichiers texte importés. Il peut y avoir des bugs tant qu'ils ne rendent pas l'application inutilisable et qu'ils ne compromettent pas les autres applications potentielles de l'utilisateur. De même, il ne faut pas que les bugs soient récurrents et si de tels bugs surviennent, il faut que l'utilisateur puisse importer son fichier sans trop attendre (rafraîchir la page, par exemple).
-    \item \textbf{Faisabilité : }Oui, implémenté dans des prototypes.
-    \item \textbf{Difficultés techniques: } La transcription texte vers code et code vers texte qui se doit d'être relativement unique, on aimerait pouvoir produire une bijection.
+\item \textbf{Faisabilité : } Oui.
+\item \textbf{Difficultés techniques: } moyenne.
 \end{itemize}
 \end{enumerate}
 
 
-\section{Spécifications et exigences techniques pour le backend :}
-
-Le développement du backend sera réalisé en utilisant Spring Boot. Les spécifications et exigences techniques suivantes doivent être prises en compte :
-
-\begin{itemize}[noitemsep]
-\item La sécurité : Les données collectées à partir des questionnaires doivent être sécurisées contre les accès non autorisés. Le backend doit être capable de gérer l'authentification et l'autorisation des utilisateurs pour garantir que seuls les utilisateurs autorisés ont accès aux données.
-\item La gestion des bases de données : Le backend doit être capable de stocker les données des questionnaires dans une base de données. Il est important de choisir une base de données qui peut gérer efficacement les données de manière évolutive et qui peut être intégrée à Spring Boot.
-\item La gestion des API : Le backend doit être capable de gérer efficacement les requêtes API provenant du frontend pour récupérer les données des questionnaires et les envoyer aux utilisateurs. Il est important de créer des API bien définies pour garantir que le frontend et le backend peuvent communiquer efficacement.
-\item La performance : Le backend doit être capable de gérer efficacement le trafic, même en cas de forte demande. Il est important de s'assurer que le backend est capable de répondre rapidement aux requêtes API et de gérer les requêtes simultanées de plusieurs utilisateurs.
-\item La documentation : Il est important de documenter clairement la structure du code, les API et la base de données pour faciliter la maintenance et l'évolutivité du logiciel.
-\end{itemize}
 \section{Conclusion :}
 
-Ce cahier des besoins décrit les propriétés manquantes ou rares dans les alternatives existantes pour un logiciel de questionnaire/sondage. Les propriétés nécessaires et les propriétés facultatives ont été spécifiées, classées en fonction de leur priorité, de leur faisabilité, de leur robustesse et des difficultés techniques à leur mise en place. Ce cahier des besoins sera utilisé pour développer un logiciel répondant aux besoins identifiés dans le cadre du projet de programmation du master informatique de l'université de Bordeaux.
+Le présent cahier des charges détaille les caractéristiques insuffisamment représentées ou manquantes dans les logiciels de questionnaires et sondages actuellement disponibles sur le marché. Nous avons soigneusement identifié et listé les fonctionnalités nécessaires et souhaitables, en les classant en fonction de leur priorité, de leur faisabilité, de leur robustesse et des défis techniques associés à leur implémentation.\\
+
+Ce document servira de fondement pour la conception et le développement d'un logiciel innovant de questionnaires et sondages, qui répondra aux besoins spécifiques identifiés. Ce projet s'inscrit dans le cadre du programme de maîtrise en informatique de l'Université de Bordeaux, où nous travailleront en étroite collaboration pour mettre en œuvre ces fonctionnalités et offrir une solution optimisée et conviviale aux utilisateurs.\\
+
+En résumé, ce cahier des charges vise à combler les lacunes des solutions actuelles et à proposer une alternative performante et adaptée aux exigences du marché et des utilisateurs.
 
 \end{document}
