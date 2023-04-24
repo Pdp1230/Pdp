@@ -279,35 +279,51 @@
             />
           </div>
         </div>
-        <div class="row justify-center q-my-xl">
-          <q-btn
-            v-if="isAddForm"
-            icon="save"
-            label="Submit the form"
-            color="green"
-            @click="submitForm"
-            :disable="!titleValid || !questionsValid"
-          />
-          <q-btn
-            v-if="isEditForm"
-            icon="edit"
-            label="Edit the form"
-            color="green"
-            @click="submitEditForm"
-            :disable="!hasActiveChanges || !titleValid || !questionsValid"
-          />
-
-<!--todo: if question type has options, options should be valid in order to submit-->
-
-          <q-tooltip v-if="isEditForm && !hasActiveChanges">
-            you need to edit the form first
-          </q-tooltip>
-          <q-tooltip v-if="!titleValid">
+        <div class="row justify-center">
+          <div v-if="isAddForm" class="q-my-xl">
+            <q-btn
+              icon="save"
+              label="Submit the form"
+              color="green"
+              @click="submitForm"
+              :disable="!titleValid || !questionsValid"
+            />
+            <q-tooltip v-if="!titleValid">
             you need to write a title first
           </q-tooltip>
           <q-tooltip v-if="titleValid && !questionsValid">
             you need to finish your questions first
           </q-tooltip>
+          </div>
+          <div v-if="isEditForm" class="q-my-xl">
+            <div class="row justify-center q-gutter-sm">
+              <q-checkbox
+                v-model="editTerms"
+                label="Answers will be deleted, do you agree?"
+              />
+            </div>
+            <div class="row justify-center">
+              <q-btn
+                icon="edit"
+                label="Edit the form"
+                color="green"
+                @click="submitEditForm"
+                :disable="!hasActiveChanges || !titleValid || !questionsValid || !editTermsAccepted"
+              />
+              <q-tooltip v-if="isEditForm && !editTermsAccepted">
+             you need to accept the editing terms
+            </q-tooltip>
+            <q-tooltip v-if="isEditForm && editTermsAccepted && !hasActiveChanges">
+              you need to edit the form first
+            </q-tooltip>
+            <q-tooltip v-if="!titleValid">
+            you need to write a title first
+          </q-tooltip>
+          <q-tooltip v-if="titleValid && !questionsValid">
+            you need to finish your questions first
+          </q-tooltip>
+            </div>
+          </div>          
         </div>
       </q-card>
     </q-dialog>
@@ -334,6 +350,7 @@ export default {
       dialogAnswers: false,
       isAddForm: false,
       isEditForm: false,
+      editTerms: false,
       cptForms: 0,
       style: "",
       changeFormStyle: false,
@@ -366,6 +383,9 @@ export default {
     },
     hasActiveChanges() {
       return !_.isEqual(this.actualForm, this.actualEditForm);
+    },
+    editTermsAccepted() {
+      return this.editTerms;
     }
   },
   methods: {
