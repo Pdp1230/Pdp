@@ -3,6 +3,10 @@ const routes = [
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [
+      {
+        path: "",
+        redirect: "login",
+      },
       { path: "home", component: () => import("pages/Home.vue"), name: "Home" },
       {
         path: "login",
@@ -30,7 +34,7 @@ const routes = [
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: "/:catchAll(.*)",
+    path: "/*",
     component: () => import("pages/ErrorNotFound.vue"),
     name : "Error404"
   },

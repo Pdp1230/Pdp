@@ -368,7 +368,7 @@ export default {
       nameAnswersDisplay : "",
     }
   },
-  created(){
+  mounted(){
     this.loadData();
   },
   computed: {
@@ -487,7 +487,7 @@ export default {
     shareForm(id) {
       if (navigator.share) {
         navigator.share({
-          url: window.location.href.split("?")[0] + "form/" + id,
+          url: window.location.href.split("?")[0].replace('home','') + "form/" + id,
         });
       } else {
         window.prompt("Copy the URL below to share the form:", 
