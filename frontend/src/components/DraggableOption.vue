@@ -59,7 +59,7 @@
   },
       props: {
         modelValue: {
-      type: Object,
+      type: Array,
       required: true,
     },
         options: {

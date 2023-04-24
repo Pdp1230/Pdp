@@ -12,5 +12,4 @@ public interface QuestionAnswerRepository extends JpaRepository<QuestionAnswer, 
     Optional<QuestionAnswer> findById(long id);
     Boolean existsById(long id);
     List<QuestionAnswer> findAllByFormAnswer(FormAnswer formAnswer);
-    void deleteAllByFormAnswer(FormAnswer formAnswer);
 }

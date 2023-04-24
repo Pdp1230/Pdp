@@ -13,6 +13,7 @@ import back.backend.entity.forms.Form;
 import back.backend.entity.forms.Option;
 import back.backend.entity.forms.Question;
 import back.backend.entity.user.User;
+import back.backend.repository.answers.CheckboxChoiceRepository;
 import back.backend.repository.answers.FormAnswerRepository;
 import back.backend.repository.answers.QuestionAnswerRepository;
 import back.backend.repository.answers.RankingOrderRepository;
@@ -40,6 +41,7 @@ public class FormService {
     private final FormAnswerRepository formAnswerRepository;
     private final QuestionAnswerRepository questionAnswerRepository;
     private final RankingOrderRepository rankingOrderRepository;
+    private final CheckboxChoiceRepository checkboxChoiceRepository;
     private final AnswerService answerService;
 
     public FormsResponse getForms(){
@@ -214,6 +216,7 @@ public class FormService {
             List<QuestionAnswer> questionAnswers = questionAnswerRepository.findAllByFormAnswer(formAnswer);
             for(var questionAnswer : questionAnswers){
                 rankingOrderRepository.deleteAllByQuestionAnswer(questionAnswer);
+                checkboxChoiceRepository.deleteAllByQuestionAnswer(questionAnswer);
                 questionAnswerRepository.delete(questionAnswer);
             }
             formAnswerRepository.delete(formAnswer);

@@ -38,7 +38,10 @@ public class QuestionAnswer {
     private String textarea;
     private Integer radioChoice;
     private Integer selectChoice;
-    private Integer[] checkboxChoices;
+
+    @OneToMany(mappedBy = "questionAnswer")
+    @OrderColumn(name = "checkboxChoiceIndex")
+    private CheckboxChoice[] checkboxChoices;
 
     @OneToMany(mappedBy = "questionAnswer")
     @OrderColumn(name = "rankingOrderIndex")

@@ -8,9 +8,11 @@ import back.backend.controller.answers.responses.FormAnswerResponse;
 import back.backend.controller.answers.responses.QuestionAnswerResponse;
 import back.backend.controller.answers.responses.RankingOrderResponse;
 import back.backend.controller.forms.email.EmailSenderService;
+import back.backend.entity.answers.CheckboxChoice;
 import back.backend.entity.answers.FormAnswer;
 import back.backend.entity.answers.QuestionAnswer;
 import back.backend.entity.answers.RankingOrder;
+import back.backend.repository.answers.CheckboxChoiceRepository;
 import back.backend.repository.answers.FormAnswerRepository;
 import back.backend.repository.answers.QuestionAnswerRepository;
 import back.backend.repository.answers.RankingOrderRepository;
@@ -27,6 +29,7 @@ public class AnswerService {
     private final FormAnswerRepository formAnswerRepository;
     private final QuestionAnswerRepository questionAnswerRepository;
     private final RankingOrderRepository rankingOrderRepository;
+    private final CheckboxChoiceRepository checkboxChoiceRepository;
     private final EmailSenderService emailSenderService;
 
     public ResponseEntity<?> postAnswer(String fetchId, FormAnswerRequest formAnswerRequest){
@@ -61,16 +64,11 @@ public class AnswerService {
                 case "select":
                     questionAnswerBuilder.selectChoice(questionAnswerRequest.getSelectChoice());
                     break;
-                case "checkbox":
-                    questionAnswerBuilder.checkboxChoices(questionAnswerRequest.getCheckboxChoices());
-                    break;
                 default:
                     break;
             }
             var questionAnswer = questionAnswerRepository.save(questionAnswerBuilder.build());
             if(questionAnswerRequest.getType().equals("ranking")){
-                System.out.println(questionAnswerRequest.getType());
-
                 var cpt = 0;
                     for(var rankingOrderRequest : questionAnswerRequest.getRankingOrder()){
                         ++cpt;
@@ -84,6 +82,20 @@ public class AnswerService {
                                                     .build()
                         ;
                         rankingOrderRepository.save(rankingOrder);
+                    }
+            }
+
+            if(questionAnswerRequest.getType().equals("checkbox")){
+                var cpt = 0;
+                    for(var checkboxChoiceRequest : questionAnswerRequest.getCheckboxChoices()){
+                        ++cpt;
+                        var checkboxChoice = CheckboxChoice.builder()
+                                                    .questionAnswer(questionAnswer)
+                                                    .checkboxChoiceIndex(cpt)
+                                                    .checkboxChoice(checkboxChoiceRequest)
+                                                    .build()
+                        ;
+                        checkboxChoiceRepository.save(checkboxChoice);
                     }
             }
 
@@ -113,7 +125,9 @@ public class AnswerService {
 
             for(var questionAnswer : questionAnswers){
                 var rankingOrders = rankingOrderRepository.findAllByQuestionAnswer(questionAnswer);
+                var checkboxChoices = checkboxChoiceRepository.findAllByQuestionAnswer(questionAnswer);
                 List<RankingOrderResponse> rankingOrdersResponse = null;
+                List<Integer> checkboxChoicesResponse = null;
                 if(questionAnswer.getType().equals("ranking")){
                     rankingOrdersResponse = new ArrayList<>();
                     for(RankingOrder rankingOrder : rankingOrders){
@@ -126,6 +140,11 @@ public class AnswerService {
                         );
                     }
                 }
+                else if(questionAnswer.getType().equals("checkbox")){
+                    checkboxChoicesResponse = new ArrayList<>();
+                    for(CheckboxChoice checkboxChoice : checkboxChoices)
+                        checkboxChoicesResponse.add(checkboxChoice.getCheckboxChoice());
+                }
                 questionAnswersResponse.add(QuestionAnswerResponse.builder()
                     .type(questionAnswer.getType())
                     .index(questionAnswer.getQuestionAnswerIndex())
@@ -133,7 +152,7 @@ public class AnswerService {
                     .textArea(questionAnswer.getTextarea())
                     .radioChoice(questionAnswer.getRadioChoice())
                     .selectChoice(questionAnswer.getSelectChoice())
-                    .checkboxChoices(questionAnswer.getCheckboxChoices())
+                    .checkboxChoices(checkboxChoicesResponse)
                     .rankingOrder(rankingOrdersResponse)
                     .build()
                 );

@@ -18,6 +18,6 @@ public class QuestionAnswerResponse {
     private String textArea;
     private Integer radioChoice;
     private Integer selectChoice;
-    private Integer[] checkboxChoices;
+    private List<Integer> checkboxChoices;
     private List<RankingOrderResponse> rankingOrder;
 }
