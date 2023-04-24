@@ -16,7 +16,7 @@
             />
             <q-input
               type="password"
-              placeholder="Your password"
+              placeholder="Password"
               flat
               dense
               bordered
@@ -83,7 +83,7 @@
               v-bind:key="field.label"
             >
               <q-input
-                :placeholder="'Type in your ' + field.label"
+                :placeholder="field.label"
                 :type="field.type"
                 v-model="field.value"
                 flat
@@ -151,19 +151,33 @@ import api from 'src/api/api';
       };
     },
     computed: {
-      cardStyle() {
-        return {
-          width: "50vh",
-          height: "70vh"
-        };
-      },
       signUpStyle() {
-        return {
-          minWidth: "60vh",
-          maxWidth: "70vh",
-          minHeight: "50vh",
-          maxHeight: "60hv",
-        };
+        let size = this.$q.screen;
+        if (size.xs) {
+            return {
+              minWidth: "90%",
+              maxWidth: "95%",
+            };
+        }
+        else if (size.sm) {
+            return {
+              minWidth: "60%",
+              maxWidth: "60%",
+            };}
+        else if (size.md) {
+            return {
+              minWidth: "40%",
+              maxWidth: "40%",
+            };}
+        else {
+            return {
+              minWidth: "20%",
+              maxWidth: "20%",
+            };}
+        /*return {
+          minWidth: "40%",
+          maxWidth: "90%",
+        };*/
       },
       signUpButtonStyle(){
         return{
@@ -206,7 +220,6 @@ import api from 'src/api/api';
         try {
           const response = await api.post('/auth/signin', data);
           sessionStorage.setItem('authToken', response.data.token);
-          sessionStorage.setItem('userEmail',this.emailSI);
           this.$router.push({ name: "Home" });
         } catch (error) {
           console.log(error.message);
